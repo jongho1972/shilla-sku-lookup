@@ -61,19 +61,12 @@ def _fetch_product(sku: str) -> dict:
     hit = next((it for it in results if sku in json.dumps(it)), results[0])
 
     code = hit.get("code", "")
-    brand_raw = (
-        hit.get("brandName")
-        or (hit.get("brandCategory") or {}).get("brandName", "")
-        or ""
-    )
-    product_name = hit.get("productNameForDisp") or hit.get("name") or ""
+    brand_cat = hit.get("brandCategory") or {}
+    brand_kr = (hit.get("brandName") or brand_cat.get("brandName") or "").strip()
+    # brandCategory.enName 이 가장 신뢰도 높은 영문명 소스
+    brand_en = (brand_cat.get("enName") or "").strip()
 
-    # brandName이 "한글명 | 영문명" 형태인 경우 분리
-    if " | " in brand_raw:
-        brand_kr, brand_en = [b.strip() for b in brand_raw.split(" | ", 1)]
-    else:
-        brand_kr = brand_raw.strip()
-        brand_en = ""
+    product_name = hit.get("productNameForDisp") or hit.get("name") or ""
 
     # 3. 상세 페이지에서 영문 브랜드명, REF.NO, 전화번호 파싱
     #    - strong.info_brand: "한글명 | 영문명"
@@ -85,12 +78,13 @@ def _fetch_product(sku: str) -> dict:
             dr = sess.get(SHILLA_DETAIL_M.format(code=code), timeout=15)
             soup = BeautifulSoup(dr.text, "html.parser")
 
-            # 브랜드명 (영문 포함)
-            info_brand = soup.select_one("strong.info_brand")
-            if info_brand:
-                brand_raw = info_brand.get_text(strip=True)
-                if " | " in brand_raw:
-                    brand_kr, brand_en = [b.strip() for b in brand_raw.split(" | ", 1)]
+            # info_brand 로 영문명 보완 (brandCategory.enName 없는 경우 폴백)
+            if not brand_en:
+                info_brand = soup.select_one("strong.info_brand")
+                if info_brand:
+                    ib_text = info_brand.get_text(strip=True)
+                    if " | " in ib_text:
+                        brand_kr, brand_en = [b.strip() for b in ib_text.split(" | ", 1)]
 
             # REF.NO / SKU.NO / 상품 문의
             for s in soup.select("strong.number_title"):
@@ -116,6 +110,11 @@ def _fetch_product(sku: str) -> dict:
         "phone": phone,
         "detail_url": SHILLA_DETAIL_PC.format(code=code) if code else "",
     }
+
+
+@app.get("/shilla_logo.png")
+async def logo():
+    return FileResponse(Path(__file__).parent / "shilla_logo.png", media_type="image/png")
 
 
 @app.get("/healthz")

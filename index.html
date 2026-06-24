@@ -2,408 +2,322 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>신라 SKU 조회</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --crimson: #8C0023;
-      --gold: #B8922A;
-      --bg: #FAFAF8;
-      --card: #FFFFFF;
-      --border: #E5E2DC;
-      --text: #1A1A1A;
-      --muted: #6B6560;
-      --row-bg: #F6F4F1;
+      --navy-900: #0B2E5C;
+      --navy-700: #13407F;
+      --blue-500: #1F6FEB;
+      --blue-050: #DCE8F6;
+      --blue-025: #F4F7FB;
+      --red-600:  #B42318;
+      --slate-700: #334155;
+      --slate-500: #64748B;
+      --slate-400: #94A3B8;
+      --slate-200: #CBD5E1;
+      --slate-100: #E5EAF0;
+      --slate-050: #EEF2F6;
     }
 
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 48px 16px 64px;
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      background: #ffffff; color: #111827;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard",
+                   "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      letter-spacing: -0.011em;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 40px;
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
     }
 
-    header .logo-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 8px;
+    /* ── 헤더 ── */
+    .header-row {
+      display: flex; align-items: baseline;
+      justify-content: space-between; gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
     }
 
-    header .logo-bar .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--crimson);
+    h1.page-title {
+      font-weight: 800; color: var(--navy-900);
+      margin: 0; font-size: 1.875rem;
+      letter-spacing: -0.025em; line-height: 1.2;
     }
 
-    header .logo-bar .brand {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      font-size: 13px;
-      letter-spacing: 0.15em;
-      color: var(--crimson);
-      text-transform: uppercase;
+    .page-desc {
+      color: var(--slate-500); font-size: 13px;
+      margin-top: 8px; letter-spacing: -0.01em;
+      line-height: 1.5;
     }
 
-    header h1 {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700;
-      font-size: 28px;
-      color: var(--text);
-      letter-spacing: -0.02em;
-    }
-
-    header p {
-      font-size: 14px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      width: 100%;
-      max-width: 560px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    /* ── 입력 섹션 ── */
+    h3 {
+      border-left: 4px solid var(--navy-900);
+      padding: 6px 0 6px 12px;
+      font-weight: 700; font-size: 1.0625rem;
+      color: var(--navy-900);
+      letter-spacing: -0.02em; line-height: 1.3;
+      margin: 2rem 0 0.75rem 0;
     }
 
     .input-row {
-      display: flex;
-      gap: 10px;
+      display: flex; gap: 8px; align-items: center;
     }
 
-    .input-row input {
+    .sku-input {
       flex: 1;
-      height: 48px;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 0 16px;
-      font-size: 16px;
-      font-family: 'Outfit', sans-serif;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      color: var(--text);
-      background: var(--bg);
-      transition: border-color 0.15s;
+      appearance: none;
+      font-family: inherit; font-size: 15px; font-weight: 500;
+      color: #111827; letter-spacing: 0.02em;
+      background-color: #F1F5F9;
+      border: 1px solid var(--slate-200); border-radius: 6px;
+      padding: 8px 14px; height: 40px;
       outline: none;
+      transition: background-color 0.15s, border-color 0.15s;
     }
+    .sku-input::placeholder { color: var(--slate-400); font-weight: 400; letter-spacing: 0; }
+    .sku-input:hover { background-color: #E2E8F0; border-color: var(--navy-700); }
+    .sku-input:focus { background-color: #fff; border-color: var(--navy-700);
+                       outline: 2px solid var(--blue-050); outline-offset: 0; }
 
-    .input-row input:focus {
-      border-color: var(--crimson);
-    }
-
-    .input-row input::placeholder {
-      font-weight: 400;
-      letter-spacing: 0;
-      color: #B0ABA4;
-    }
-
-    .btn-search {
-      height: 48px;
-      padding: 0 24px;
-      background: var(--crimson);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
+    .search-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 0 18px; height: 40px; border-radius: 6px;
+      font-size: 14px; font-weight: 600;
+      background: var(--navy-900); color: #fff;
+      border: none; cursor: pointer;
+      font-family: inherit; letter-spacing: -0.01em;
       white-space: nowrap;
-      transition: background 0.15s, transform 0.1s;
+      transition: background 0.15s;
     }
+    .search-btn:hover { background: var(--navy-700); }
+    .search-btn:disabled { background: var(--slate-400); cursor: wait; }
 
-    .btn-search:hover { background: #6e001a; }
-    .btn-search:active { transform: scale(0.97); }
-    .btn-search:disabled { background: #C8B9B9; cursor: default; }
-
-    .status {
-      margin-top: 16px;
-      font-size: 13px;
-      color: var(--muted);
-      min-height: 20px;
-      text-align: center;
+    .status-line {
+      margin-top: 10px; min-height: 18px;
+      font-size: 13px; color: var(--slate-500);
+      letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 6px;
     }
+    .status-line.error { color: var(--red-600); }
 
-    .status.error { color: #C0392B; }
-
-    /* 결과 테이블 */
-    .result-wrap {
-      margin-top: 24px;
-      border-top: 1px solid var(--border);
-      padding-top: 24px;
+    /* ── 결과 카드 ── */
+    .result-card {
       display: none;
+      background: #fff;
+      border: 1px solid var(--slate-100);
+      border-left: 4px solid var(--navy-900);
+      border-radius: 8px;
+      padding: 20px 22px 18px;
+      margin-top: 1.25rem;
     }
-
-    .result-wrap.show { display: block; }
+    .result-card.show { display: block; }
 
     .result-table {
       width: 100%;
       border-collapse: collapse;
-    }
-
-    .result-table tr:nth-child(odd) td,
-    .result-table tr:nth-child(odd) th {
-      background: var(--row-bg);
-    }
-
-    .result-table th,
-    .result-table td {
-      padding: 11px 14px;
       font-size: 14px;
-      border-radius: 0;
-      vertical-align: middle;
     }
 
     .result-table th {
-      width: 130px;
-      color: var(--muted);
-      font-weight: 500;
-      text-align: left;
+      width: 110px; padding: 9px 10px;
+      text-align: left; vertical-align: middle;
+      font-size: 12px; font-weight: 600;
+      color: var(--slate-500); letter-spacing: -0.01em;
       white-space: nowrap;
     }
 
     .result-table td {
-      color: var(--text);
-      font-weight: 600;
-      word-break: break-all;
+      padding: 9px 10px; vertical-align: middle;
+      font-weight: 600; color: #111827;
+    }
+
+    .result-table tr:not(:last-child) td,
+    .result-table tr:not(:last-child) th {
+      border-bottom: 1px solid var(--slate-050);
     }
 
     .cell-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
     }
 
-    .btn-copy {
-      flex-shrink: 0;
-      width: 28px; height: 28px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: #fff;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--muted);
-      transition: border-color 0.15s, color 0.15s, background 0.15s;
-      padding: 0;
-    }
-    .btn-copy:hover { border-color: var(--crimson); color: var(--crimson); background: #fff8f9; }
-    .btn-copy.copied { border-color: #27AE60; color: #27AE60; background: #F0FBF4; }
-
-    .result-table td.brand-en {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
+    .td-brand-en {
+      font-size: 15px; font-weight: 700;
       letter-spacing: 0.04em;
     }
 
-    .result-table td.ref {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      color: var(--crimson);
-    }
+    .td-ref { color: var(--navy-900); letter-spacing: 0.05em; }
+    .td-phone { font-size: 15px; font-weight: 700; }
 
-    .result-table td.phone {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--gold);
+    /* 복사 버튼 */
+    .btn-copy {
+      flex-shrink: 0;
+      width: 26px; height: 26px;
+      border: 1px solid var(--slate-200); border-radius: 4px;
+      background: transparent; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--slate-400);
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      padding: 0;
     }
+    .btn-copy:hover { border-color: var(--navy-700); color: var(--navy-700); background: var(--blue-025); }
+    .btn-copy.copied { border-color: #047857; color: #047857; background: #F0FDF4; }
 
     .result-footer {
-      margin-top: 16px;
-      display: flex;
-      justify-content: flex-end;
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid var(--slate-050);
+      display: flex; justify-content: flex-end;
     }
 
-    .btn-link {
-      font-size: 13px;
-      color: var(--crimson);
-      text-decoration: none;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: opacity 0.15s;
+    .detail-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+      background: var(--navy-900); color: #fff;
+      text-decoration: none; letter-spacing: -0.01em;
+      transition: background 0.15s;
     }
+    .detail-link:hover { background: var(--navy-700); }
 
-    .btn-link:hover { opacity: 0.7; }
-
+    /* 스피너 */
     .spinner {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2px solid #E5E2DC;
-      border-top-color: var(--crimson);
+      width: 14px; height: 14px;
+      border: 2px solid var(--slate-200);
+      border-top-color: var(--navy-900);
       border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
+      animation: spin 0.6s linear infinite;
+      flex-shrink: 0;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    footer {
-      margin-top: 48px;
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
+    /* 푸터 */
+    .site-footer {
+      margin-top: 3rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--slate-100);
+      font-size: 12px; color: var(--slate-400);
+      letter-spacing: -0.01em;
     }
-
-    footer a { color: var(--gold); text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    .site-footer a { color: var(--slate-400); text-decoration: none; }
+    .site-footer a:hover { color: var(--slate-500); }
 
     @media (max-width: 480px) {
-      header h1 { font-size: 22px; }
-      .card { padding: 24px 20px; }
-      .input-row { flex-direction: column; }
-      .btn-search { height: 44px; }
+      .container { padding: 1.75rem 1rem 3rem; }
+      h1.page-title { font-size: 1.5rem; }
+      .input-row { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
 <body>
+<div class="container">
 
-<header>
-  <div class="logo-bar">
-    <div class="dot"></div>
-    <span class="brand">The Shilla Duty Free</span>
-    <div class="dot"></div>
+  <div class="header-row">
+    <h1 class="page-title">신라 SKU 조회</h1>
   </div>
-  <h1>SKU 상품 조회</h1>
-  <p>SKU 번호 입력 → 브랜드명 · REF.NO · 상품문의 전화번호 확인</p>
-</header>
+  <p class="page-desc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품문의 전화번호</p>
 
-<div class="card">
+  <h3>조회</h3>
+
   <div class="input-row">
     <input
       id="skuInput"
+      class="sku-input"
       type="text"
       inputmode="numeric"
       placeholder="SKU 번호 입력 (예: 096711001496)"
       autocomplete="off"
       spellcheck="false"
     />
-    <button class="btn-search" id="btnSearch" onclick="doSearch()">조회</button>
+    <button class="search-btn" id="btnSearch" onclick="doSearch()">조회</button>
   </div>
-  <div class="status" id="status"></div>
+  <div class="status-line" id="status"></div>
 
-  <div class="result-wrap" id="resultWrap">
+  <div class="result-card" id="resultCard">
     <table class="result-table" id="resultTable"></table>
     <div class="result-footer">
-      <a id="detailLink" href="#" target="_blank" class="btn-link">
-        신라 상품 페이지 열기 ↗
-      </a>
+      <a id="detailLink" href="#" target="_blank" class="detail-link">상품 페이지 열기 ↗</a>
     </div>
   </div>
+
+  <footer class="site-footer">
+    Built with Claude Code by 이종호 (<a href="https://jhawk.kr" target="_blank">jhawk.kr</a>)
+  </footer>
 </div>
 
-<footer>Built with Claude Code by 이종호 (<a href="https://jhawk.kr" target="_blank">jhawk.kr</a>)</footer>
-
 <script>
-  const input = document.getElementById('skuInput');
-  const btn   = document.getElementById('btnSearch');
+  const input  = document.getElementById('skuInput');
+  const btn    = document.getElementById('btnSearch');
   const status = document.getElementById('status');
-  const wrap  = document.getElementById('resultWrap');
-  const tbl   = document.getElementById('resultTable');
-  const link  = document.getElementById('detailLink');
+  const card   = document.getElementById('resultCard');
+  const tbl    = document.getElementById('resultTable');
+  const link   = document.getElementById('detailLink');
 
   input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
   async function doSearch() {
     const sku = input.value.trim();
     if (!sku) { showStatus('SKU 번호를 입력해주세요', 'error'); return; }
-
     btn.disabled = true;
-    wrap.classList.remove('show');
-    showStatus('<span class="spinner"></span>조회 중…');
-
+    card.classList.remove('show');
+    showStatus('<span class="spinner"></span><span>조회 중…</span>');
     try {
-      const res = await fetch(`/api/lookup?sku=${encodeURIComponent(sku)}`);
+      const res  = await fetch(`/api/lookup?sku=${encodeURIComponent(sku)}`);
       const data = await res.json();
-
-      if (!res.ok) {
-        showStatus(data.detail || '조회 실패', 'error');
-        return;
-      }
-
+      if (!res.ok) { showStatus(data.detail || '조회 실패', 'error'); return; }
       renderResult(data);
       showStatus('');
-    } catch (e) {
+    } catch {
       showStatus('서버에 연결할 수 없습니다', 'error');
     } finally {
       btn.disabled = false;
     }
   }
 
+  const COPY_ICON  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  const CHECK_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
   function renderResult(d) {
     const rows = [
       ['국문 브랜드명', d.brand_kr || '—', ''],
-      ['영문 브랜드명', d.brand_en || '—', 'brand-en'],
+      ['영문 브랜드명', d.brand_en || '—', 'td-brand-en'],
       ['상품명',       d.product_name || '—', ''],
-      ['REF.NO',       d.ref_no || '—', 'ref'],
-      ['SKU.NO',       d.sku || '—', ''],
-      ['상품 문의',    d.phone || '—', 'phone'],
+      ['REF.NO',       d.ref_no || '—', 'td-ref'],
+      ['SKU.NO',       d.sku   || '—', ''],
+      ['상품 문의',    d.phone || '—', 'td-phone'],
     ];
+    tbl.innerHTML = rows.map(([label, value, cls]) => {
+      const copyBtn = value !== '—'
+        ? `<button class="btn-copy" title="복사" onclick="copyVal(this,'${escAttr(value)}')">${COPY_ICON}</button>`
+        : '';
+      return `<tr><th>${label}</th><td><div class="cell-wrap ${cls}"><span>${escHtml(value)}</span>${copyBtn}</div></td></tr>`;
+    }).join('');
+    link.href = d.detail_url || '#';
+    link.style.display = d.detail_url ? 'inline-flex' : 'none';
+    card.classList.add('show');
+  }
 
-    tbl.innerHTML = rows.map(([label, value, cls]) =>
-      `<tr><th>${label}</th><td class="${cls}"><div class="cell-wrap"><span>${escHtml(value)}</span>${value !== '—' ? `<button class="btn-copy" title="복사" onclick="copyVal(this,'${escAttr(value)}')">${COPY_ICON}</button>` : ''}</div></td></tr>`
-    ).join('');
-
-    if (d.detail_url) {
-      link.href = d.detail_url;
-      link.style.display = 'inline-flex';
-    } else {
-      link.style.display = 'none';
-    }
-
-    wrap.classList.add('show');
+  function copyVal(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.innerHTML = CHECK_ICON; btn.classList.add('copied');
+      setTimeout(() => { btn.innerHTML = COPY_ICON; btn.classList.remove('copied'); }, 1500);
+    });
   }
 
   function showStatus(msg, type = '') {
     status.innerHTML = msg;
-    status.className = 'status' + (type ? ` ${type}` : '');
-  }
-
-  const COPY_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-  const CHECK_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-
-  function copyVal(btn, text) {
-    navigator.clipboard.writeText(text).then(() => {
-      btn.innerHTML = CHECK_ICON;
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.innerHTML = COPY_ICON;
-        btn.classList.remove('copied');
-      }, 1500);
-    });
+    status.className = 'status-line' + (type ? ` ${type}` : '');
   }
 
   function escHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
-
   function escAttr(s) {
-    return String(s).replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    return String(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;');
   }
 </script>
 </body>
