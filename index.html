@@ -237,10 +237,10 @@
   </div>
   <div class="status-line" id="status"></div>
 
-  <div class="result-card" id="resultCard">
+  <div class="result-card show" id="resultCard">
     <table class="result-table" id="resultTable"></table>
     <div class="result-footer">
-      <a id="detailLink" href="#" target="_blank" class="detail-link">상품 페이지 열기 ↗</a>
+      <a id="detailLink" href="#" target="_blank" class="detail-link" style="display:none">상품 페이지 열기 ↗</a>
     </div>
   </div>
 
@@ -258,6 +258,10 @@
   const link   = document.getElementById('detailLink');
 
   input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+  // 초기 빈 상태 렌더링
+  renderResult({});
+
 
   async function doSearch() {
     const sku = input.value.trim();
