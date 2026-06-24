@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>신라 SKU 조회</title>
+  <title>신라면세점 SKU 조회</title>
   <style>
     :root {
       --navy-900: #0B2E5C;
       --navy-700: #13407F;
-      --blue-500: #1F6FEB;
       --blue-050: #DCE8F6;
       --blue-025: #F4F7FB;
       --red-600:  #B42318;
+      --green-700:#047857;
       --slate-700: #334155;
       --slate-500: #64748B;
       --slate-400: #94A3B8;
@@ -30,74 +30,100 @@
       letter-spacing: -0.011em;
     }
 
-    .container {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 2.5rem 1.5rem 4rem;
-    }
-
-    /* ── 헤더 ── */
-    .header-row {
-      display: flex; align-items: baseline;
-      justify-content: space-between; gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 6px;
-    }
+    .container { max-width: 800px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
 
     h1.page-title {
       font-weight: 800; color: var(--navy-900);
-      margin: 0; font-size: 1.875rem;
+      margin: 0 0 4px; font-size: 1.875rem;
       letter-spacing: -0.025em; line-height: 1.2;
     }
-
     .page-desc {
       color: var(--slate-500); font-size: 13px;
-      margin-top: 8px; letter-spacing: -0.01em;
-      line-height: 1.5;
+      margin-top: 6px; letter-spacing: -0.01em; line-height: 1.5;
     }
 
-    /* ── 입력 섹션 ── */
+    /* ── 섹션 박스 ── */
+    .section-box {
+      background: var(--slate-050);
+      border: 1px solid var(--slate-100);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.75rem;
+    }
     h3 {
       border-left: 4px solid var(--navy-900);
       padding: 6px 0 6px 12px;
       font-weight: 700; font-size: 1.0625rem;
       color: var(--navy-900);
       letter-spacing: -0.02em; line-height: 1.3;
-      margin: 2rem 0 0.75rem 0;
+      margin: 0 0 0.5rem 0;
+    }
+    .section-desc {
+      font-size: 12px; color: var(--slate-700);
+      margin-bottom: 14px; padding-left: 16px; letter-spacing: -0.01em;
     }
 
-    .input-row {
-      display: flex; gap: 8px; align-items: center;
-    }
+    /* ── 입력 ── */
+    .input-row { display: flex; gap: 8px; align-items: flex-start; }
 
     .sku-input {
-      flex: 1;
-      appearance: none;
+      flex: 1; appearance: none;
       font-family: inherit; font-size: 15px; font-weight: 500;
       color: #111827; letter-spacing: 0.02em;
-      background-color: #F1F5F9;
+      background-color: #ffffff;
       border: 1px solid var(--slate-200); border-radius: 6px;
       padding: 8px 14px; height: 40px;
-      outline: none;
-      transition: background-color 0.15s, border-color 0.15s;
+      outline: none; transition: border-color 0.15s;
     }
     .sku-input::placeholder { color: var(--slate-400); font-weight: 400; letter-spacing: 0; }
-    .sku-input:hover { background-color: #E2E8F0; border-color: var(--navy-700); }
-    .sku-input:focus { background-color: #fff; border-color: var(--navy-700);
+    .sku-input:hover { border-color: var(--navy-700); }
+    .sku-input:focus { border-color: var(--navy-700);
                        outline: 2px solid var(--blue-050); outline-offset: 0; }
 
+    .sku-textarea {
+      flex: 1; appearance: none;
+      font-family: inherit; font-size: 14px; font-weight: 500;
+      color: #111827; letter-spacing: 0.02em;
+      background-color: #ffffff;
+      border: 1px solid var(--slate-200); border-radius: 6px;
+      padding: 10px 14px; outline: none; resize: vertical;
+      min-height: 100px; line-height: 1.7;
+      transition: border-color 0.15s;
+    }
+    .sku-textarea::placeholder { color: var(--slate-400); font-weight: 400; letter-spacing: 0; }
+    .sku-textarea:hover { border-color: var(--navy-700); }
+    .sku-textarea:focus { border-color: var(--navy-700);
+                          outline: 2px solid var(--blue-050); outline-offset: 0; }
+
+    /* ── 버튼 그룹 ── */
+    .btn-group {
+      display: flex; flex-direction: column; gap: 6px;
+      flex-shrink: 0;
+    }
+    .btn-group-row { display: flex; gap: 6px; align-items: center; }
+
     .search-btn {
-      display: inline-flex; align-items: center; gap: 6px;
+      display: inline-flex; align-items: center;
       padding: 0 18px; height: 40px; border-radius: 6px;
       font-size: 14px; font-weight: 600;
       background: var(--navy-900); color: #fff;
       border: none; cursor: pointer;
-      font-family: inherit; letter-spacing: -0.01em;
-      white-space: nowrap;
+      font-family: inherit; letter-spacing: -0.01em; white-space: nowrap;
       transition: background 0.15s;
     }
-    .search-btn:hover { background: var(--navy-700); }
+    .search-btn:hover    { background: var(--navy-700); }
     .search-btn:disabled { background: var(--slate-400); cursor: wait; }
+
+    .reset-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0 14px; height: 40px; border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+      background: #fff; color: var(--slate-500);
+      border: 1px solid var(--slate-200); cursor: pointer;
+      font-family: inherit; letter-spacing: -0.01em; white-space: nowrap;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .reset-btn:hover { border-color: var(--slate-400); color: var(--slate-700); background: var(--slate-050); }
 
     .status-line {
       margin-top: 10px; min-height: 18px;
@@ -107,74 +133,50 @@
     }
     .status-line.error { color: var(--red-600); }
 
-    /* ── 결과 카드 ── */
+    /* ── 단건 결과 카드 ── */
     .result-card {
       display: none;
       background: #fff;
-      border: 1px solid var(--slate-100);
+      border: 1px solid var(--slate-200);
       border-left: 4px solid var(--navy-900);
       border-radius: 8px;
-      padding: 20px 22px 18px;
+      padding: 18px 20px 16px;
       margin-top: 1.25rem;
     }
     .result-card.show { display: block; }
 
-    .result-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
+    .result-table { width: 100%; border-collapse: collapse; font-size: 14px; }
     .result-table th {
       width: 110px; padding: 9px 10px;
       text-align: left; vertical-align: middle;
       font-size: 12px; font-weight: 600;
-      color: var(--slate-500); letter-spacing: -0.01em;
-      white-space: nowrap;
+      color: var(--slate-500); letter-spacing: -0.01em; white-space: nowrap;
     }
-
-    .result-table td {
-      padding: 9px 10px; vertical-align: middle;
-      font-weight: 600; color: #111827;
-    }
-
+    .result-table td { padding: 9px 10px; vertical-align: middle; font-weight: 600; color: #111827; }
     .result-table tr:not(:last-child) td,
-    .result-table tr:not(:last-child) th {
-      border-bottom: 1px solid var(--slate-050);
-    }
+    .result-table tr:not(:last-child) th { border-bottom: 1px solid var(--slate-100); }
 
-    .cell-wrap {
-      display: flex; align-items: center; gap: 8px;
-    }
-
-    .td-brand-en {
-      font-size: 15px; font-weight: 700;
-      letter-spacing: 0.04em;
-    }
-
-    .td-ref { color: var(--navy-900); letter-spacing: 0.05em; }
+    .cell-wrap { display: flex; align-items: center; gap: 8px; }
+    .td-brand-en { font-size: 15px; font-weight: 700; letter-spacing: 0.04em; }
+    .td-ref   { color: var(--navy-900); letter-spacing: 0.05em; }
     .td-phone { font-size: 15px; font-weight: 700; }
 
-    /* 복사 버튼 */
     .btn-copy {
-      flex-shrink: 0;
-      width: 26px; height: 26px;
+      flex-shrink: 0; width: 26px; height: 26px;
       border: 1px solid var(--slate-200); border-radius: 4px;
       background: transparent; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       color: var(--slate-400);
-      transition: border-color 0.15s, color 0.15s, background 0.15s;
-      padding: 0;
+      transition: border-color 0.15s, color 0.15s, background 0.15s; padding: 0;
     }
-    .btn-copy:hover { border-color: var(--navy-700); color: var(--navy-700); background: var(--blue-025); }
-    .btn-copy.copied { border-color: #047857; color: #047857; background: #F0FDF4; }
+    .btn-copy:hover  { border-color: var(--navy-700); color: var(--navy-700); background: var(--blue-025); }
+    .btn-copy.copied { border-color: var(--green-700); color: var(--green-700); background: #F0FDF4; }
 
     .result-footer {
-      margin-top: 14px; padding-top: 12px;
-      border-top: 1px solid var(--slate-050);
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid var(--slate-100);
       display: flex; justify-content: flex-end;
     }
-
     .detail-link {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; border-radius: 6px;
@@ -185,62 +187,172 @@
     }
     .detail-link:hover { background: var(--navy-700); }
 
-    /* 스피너 */
+    /* ── 다건 결과 테이블 ── */
+    .batch-result { display: none; margin-top: 1.25rem; }
+    .batch-result.show { display: block; }
+
+    .batch-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .batch-meta { font-size: 13px; color: var(--slate-500); letter-spacing: -0.01em; }
+
+    .csv-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 5px;
+      font-size: 12px; font-weight: 600;
+      background: #fff; color: var(--navy-900);
+      border: 1px solid var(--navy-900); cursor: pointer;
+      font-family: inherit; letter-spacing: -0.01em;
+      transition: background 0.15s;
+    }
+    .csv-btn:hover { background: var(--blue-025); }
+
+    .batch-scroll {
+      overflow-x: auto;
+      border: 1px solid var(--slate-200);
+      border-left: 4px solid var(--navy-900);
+      border-radius: 8px; background: #fff;
+    }
+    .batch-table {
+      width: 100%; min-width: 700px;
+      border-collapse: collapse; font-size: 13px;
+    }
+    .batch-table thead th {
+      padding: 10px 12px; text-align: left; white-space: nowrap;
+      font-size: 11px; font-weight: 700;
+      color: var(--slate-500); letter-spacing: 0.02em; text-transform: uppercase;
+      background: var(--slate-050); border-bottom: 1px solid var(--slate-100);
+    }
+    .batch-table tbody tr:not(:last-child) td { border-bottom: 1px solid var(--slate-050); }
+    .batch-table tbody tr:hover td { background: var(--blue-025); }
+    .batch-table td { padding: 9px 12px; vertical-align: middle; color: #111827; font-weight: 500; }
+
+    .bt-num   { color: var(--slate-400); font-size: 11px; font-weight: 700; width: 28px; }
+    .bt-sku   { font-family: "SF Mono","Fira Code",monospace; font-size: 12px;
+                color: var(--slate-700); letter-spacing: 0.03em; }
+    .bt-brand-en { font-weight: 700; letter-spacing: 0.04em; }
+    .bt-ref   { color: var(--navy-900); font-weight: 600; letter-spacing: 0.04em; }
+    .bt-error td { color: var(--slate-400) !important; }
+
+    .bt-link {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px;
+      border: 1px solid var(--slate-200); border-radius: 4px;
+      color: var(--slate-400); text-decoration: none; font-size: 13px;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .bt-link:hover { border-color: var(--navy-700); color: var(--navy-700); background: var(--blue-025); }
+
+    /* ── 스피너 ── */
     .spinner {
       width: 14px; height: 14px;
-      border: 2px solid var(--slate-200);
-      border-top-color: var(--navy-900);
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      flex-shrink: 0;
+      border: 2px solid var(--slate-200); border-top-color: var(--navy-900);
+      border-radius: 50%; animation: spin 0.6s linear infinite; flex-shrink: 0;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* 푸터 */
+    /* ── 푸터 ── */
     .site-footer {
       margin-top: 3rem; padding-top: 1.5rem;
       border-top: 1px solid var(--slate-100);
-      font-size: 12px; color: var(--slate-400);
-      letter-spacing: -0.01em;
+      font-size: 12px; color: var(--slate-400); letter-spacing: -0.01em;
     }
     .site-footer a { color: var(--slate-400); text-decoration: none; }
     .site-footer a:hover { color: var(--slate-500); }
 
-    @media (max-width: 480px) {
+    @media (max-width: 560px) {
       .container { padding: 1.75rem 1rem 3rem; }
       h1.page-title { font-size: 1.5rem; }
-      .input-row { flex-direction: column; align-items: stretch; }
+      .input-row { flex-direction: column; }
+      .btn-group { flex-direction: row; }
+      .search-btn, .reset-btn { flex: 1; justify-content: center; }
     }
   </style>
 </head>
 <body>
 <div class="container">
 
-  <div class="header-row">
-    <h1 class="page-title">신라 SKU 조회</h1>
-  </div>
+  <h1 class="page-title">신라면세점 SKU 조회</h1>
   <p class="page-desc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품문의 전화번호</p>
 
-  <h3>조회</h3>
+  <!-- ────────────── 단건 조회 ────────────── -->
+  <div class="section-box">
+    <h3>단건 조회</h3>
+    <p class="section-desc">SKU 1개 조회 — 복사 버튼 및 상품 페이지 링크 제공</p>
 
-  <div class="input-row">
-    <input
-      id="skuInput"
-      class="sku-input"
-      type="text"
-      inputmode="numeric"
-      placeholder="SKU 번호 입력 (예: 096711001496)"
-      autocomplete="off"
-      spellcheck="false"
-    />
-    <button class="search-btn" id="btnSearch" onclick="doSearch()">조회</button>
+    <div class="input-row">
+      <input
+        id="singleInput"
+        class="sku-input"
+        type="text"
+        inputmode="numeric"
+        placeholder="SKU 번호 입력 (예: 096711001496)"
+        autocomplete="off" spellcheck="false"
+      />
+      <div class="btn-group-row">
+        <button class="search-btn" id="singleBtn" onclick="doSingle()">조회</button>
+        <button class="reset-btn" onclick="resetSingle()">초기화</button>
+      </div>
+    </div>
+    <div class="status-line" id="singleStatus"></div>
+
+    <div class="result-card show" id="resultCard">
+      <table class="result-table" id="resultTable"></table>
+      <div class="result-footer">
+        <a id="detailLink" href="#" target="_blank" class="detail-link" style="display:none">상품 페이지 열기 ↗</a>
+      </div>
+    </div>
   </div>
-  <div class="status-line" id="status"></div>
 
-  <div class="result-card show" id="resultCard">
-    <table class="result-table" id="resultTable"></table>
-    <div class="result-footer">
-      <a id="detailLink" href="#" target="_blank" class="detail-link" style="display:none">상품 페이지 열기 ↗</a>
+  <!-- ────────────── 다건 조회 ────────────── -->
+  <div class="section-box">
+    <h3>다건 조회</h3>
+    <p class="section-desc">SKU 여러 개 — 엑셀에서 복사해서 붙여넣기(최대 50개), 결과 표 csv 저장</p>
+
+    <div class="input-row">
+      <textarea
+        id="batchInput"
+        class="sku-textarea"
+        placeholder="096711001496&#10;287231000004&#10;954110000002"
+        autocomplete="off" spellcheck="false"
+      ></textarea>
+      <div class="btn-group-row" style="align-self:flex-end">
+        <button class="search-btn" id="batchBtn" onclick="doBatch()">조회</button>
+        <button class="reset-btn" onclick="resetBatch()">초기화</button>
+      </div>
+    </div>
+    <div class="status-line" id="batchStatus"></div>
+
+    <div class="batch-result" id="batchResult">
+      <div class="batch-toolbar">
+        <span class="batch-meta" id="batchMeta"></span>
+        <button class="csv-btn" onclick="downloadCSV()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          CSV 저장
+        </button>
+      </div>
+      <div class="batch-scroll">
+        <table class="batch-table">
+          <thead>
+            <tr>
+              <th class="bt-num">#</th>
+              <th>SKU.NO</th>
+              <th>국문 브랜드명</th>
+              <th>영문 브랜드명</th>
+              <th>상품명</th>
+              <th>REF.NO</th>
+              <th>상품 문의</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="batchBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -250,49 +362,137 @@
 </div>
 
 <script>
-  const input  = document.getElementById('skuInput');
-  const btn    = document.getElementById('btnSearch');
-  const status = document.getElementById('status');
-  const card   = document.getElementById('resultCard');
-  const tbl    = document.getElementById('resultTable');
-  const link   = document.getElementById('detailLink');
+  /* ── DOM refs ── */
+  const singleInput  = document.getElementById('singleInput');
+  const singleBtn    = document.getElementById('singleBtn');
+  const singleStatus = document.getElementById('singleStatus');
+  const card         = document.getElementById('resultCard');
+  const tbl          = document.getElementById('resultTable');
+  const link         = document.getElementById('detailLink');
 
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  const batchInput  = document.getElementById('batchInput');
+  const batchBtn    = document.getElementById('batchBtn');
+  const batchStatus = document.getElementById('batchStatus');
+  const batchResult = document.getElementById('batchResult');
+  const batchBody   = document.getElementById('batchBody');
+  const batchMeta   = document.getElementById('batchMeta');
 
-  // 초기 빈 상태 렌더링
-  renderResult({});
+  let currentBatchData = [];
 
+  singleInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSingle(); });
 
-  async function doSearch() {
-    const sku = input.value.trim();
-    if (!sku) { showStatus('SKU 번호를 입력해주세요', 'error'); return; }
-    btn.disabled = true;
+  /* 초기 빈 카드 표시 */
+  renderSingleResult({});
+
+  /* ── 단건 초기화 ── */
+  function resetSingle() {
+    singleInput.value = '';
+    singleInput.focus();
+    showStatus(singleStatus, '');
+    renderSingleResult({});
+  }
+
+  /* ── 다건 초기화 ── */
+  function resetBatch() {
+    batchInput.value = '';
+    batchInput.focus();
+    showStatus(batchStatus, '');
+    batchResult.classList.remove('show');
+    currentBatchData = [];
+  }
+
+  /* ── 단건 조회 ── */
+  async function doSingle() {
+    const sku = singleInput.value.trim();
+    if (!sku) { showStatus(singleStatus, 'SKU 번호를 입력해주세요', 'error'); return; }
+    singleBtn.disabled = true;
     card.classList.remove('show');
-    showStatus('<span class="spinner"></span><span>조회 중…</span>');
+    showStatus(singleStatus, '<span class="spinner"></span><span>조회 중…</span>');
     try {
       const res  = await fetch(`/api/lookup?sku=${encodeURIComponent(sku)}`);
       const data = await res.json();
-      if (!res.ok) { showStatus(data.detail || '조회 실패', 'error'); return; }
-      renderResult(data);
-      showStatus('');
+      if (!res.ok) { showStatus(singleStatus, data.detail || '조회 실패', 'error'); return; }
+      renderSingleResult(data);
+      showStatus(singleStatus, '');
     } catch {
-      showStatus('서버에 연결할 수 없습니다', 'error');
+      showStatus(singleStatus, '서버에 연결할 수 없습니다', 'error');
     } finally {
-      btn.disabled = false;
+      singleBtn.disabled = false;
     }
   }
 
+  /* ── 다건 조회 ── */
+  async function doBatch() {
+    const raw  = batchInput.value.trim();
+    if (!raw) { showStatus(batchStatus, 'SKU 번호를 입력해주세요', 'error'); return; }
+    const skus = raw.split(/[\s,\n\r]+/).map(s => s.trim()).filter(Boolean);
+    if (!skus.length)   { showStatus(batchStatus, 'SKU 번호를 입력해주세요', 'error'); return; }
+    if (skus.length > 50) { showStatus(batchStatus, '한 번에 최대 50개까지 조회할 수 있습니다', 'error'); return; }
+
+    batchBtn.disabled = true;
+    batchResult.classList.remove('show');
+    showStatus(batchStatus, `<span class="spinner"></span><span>${skus.length}개 조회 중…</span>`);
+    try {
+      const res  = await fetch('/api/batch', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({skus}),
+      });
+      const data = await res.json();
+      if (!res.ok) { showStatus(batchStatus, data.detail || '조회 실패', 'error'); return; }
+      currentBatchData = data;
+      renderBatchTable(data);
+      showStatus(batchStatus, '');
+    } catch {
+      showStatus(batchStatus, '서버에 연결할 수 없습니다', 'error');
+    } finally {
+      batchBtn.disabled = false;
+    }
+  }
+
+  /* ── CSV 저장 ── */
+  function downloadCSV() {
+    if (!currentBatchData.length) return;
+    const headers = ['#', 'SKU.NO', '국문 브랜드명', '영문 브랜드명', '상품명', 'REF.NO', '상품 문의', '상품 페이지'];
+    const rows = currentBatchData.map((r, i) => [
+      i + 1,
+      r.sku          || '',
+      r.brand_kr     || '',
+      r.brand_en     || '',
+      r.product_name || '',
+      r.ref_no       || '',
+      r.phone        || '',
+      r.detail_url   || '',
+    ]);
+    const csv = [headers, ...rows]
+      .map((row, ri) => row.map((cell, ci) => {
+        // SKU.NO(ci=1), REF.NO(ci=5)는 ="값" 수식으로 감싸 Excel 텍스트 강제
+        if (ri > 0 && (ci === 1 || ci === 5)) return `="${String(cell).replace(/"/g, '""')}"`;
+        return `"${String(cell).replace(/"/g, '""')}"`;
+      }).join(','))
+      .join('\r\n');
+    const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const now  = new Date();
+    const stamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    a.href = url; a.download = `SKU조회_${stamp}.csv`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  }
+
+  /* ── 단건 렌더 ── */
   const COPY_ICON  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
   const CHECK_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 
-  function renderResult(d) {
+  function renderSingleResult(d) {
     const rows = [
-      ['국문 브랜드명', d.brand_kr || '—', ''],
-      ['영문 브랜드명', d.brand_en || '—', 'td-brand-en'],
-      ['상품명',       d.product_name || '—', ''],
-      ['REF.NO',       d.ref_no || '—', 'td-ref'],
-      ['SKU.NO',       d.sku   || '—', ''],
-      ['상품 문의',    d.phone || '—', 'td-phone'],
+      ['국문 브랜드명', d.brand_kr    || '—', ''],
+      ['영문 브랜드명', d.brand_en    || '—', 'td-brand-en'],
+      ['상품명',        d.product_name|| '—', ''],
+      ['REF.NO',        d.ref_no      || '—', 'td-ref'],
+      ['SKU.NO',        d.sku         || '—', ''],
+      ['상품 문의',     d.phone       || '—', 'td-phone'],
     ];
     tbl.innerHTML = rows.map(([label, value, cls]) => {
       const copyBtn = value !== '—'
@@ -305,6 +505,34 @@
     card.classList.add('show');
   }
 
+  /* ── 다건 렌더 ── */
+  function renderBatchTable(rows) {
+    const ok   = rows.filter(r => !r.error).length;
+    const fail = rows.filter(r =>  r.error).length;
+    batchMeta.textContent = `총 ${rows.length}개 조회 — 성공 ${ok}건` + (fail ? ` / 조회 실패 ${fail}건` : '');
+    batchBody.innerHTML = rows.map((r, i) => {
+      if (r.error) {
+        return `<tr class="bt-error">
+          <td class="bt-num">${i + 1}</td>
+          <td class="bt-sku">${escHtml(r.sku)}</td>
+          <td colspan="5" style="color:var(--slate-400);font-style:italic">조회 실패</td>
+          <td></td></tr>`;
+      }
+      const lnk = r.detail_url
+        ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank" title="상품 페이지">↗</a>` : '';
+      return `<tr>
+        <td class="bt-num">${i + 1}</td>
+        <td class="bt-sku">${escHtml(r.sku || '')}</td>
+        <td>${escHtml(r.brand_kr || '—')}</td>
+        <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
+        <td>${escHtml(r.product_name || '—')}</td>
+        <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
+        <td>${escHtml(r.phone || '—')}</td>
+        <td>${lnk}</td></tr>`;
+    }).join('');
+    batchResult.classList.add('show');
+  }
+
   function copyVal(btn, text) {
     navigator.clipboard.writeText(text).then(() => {
       btn.innerHTML = CHECK_ICON; btn.classList.add('copied');
@@ -312,9 +540,9 @@
     });
   }
 
-  function showStatus(msg, type = '') {
-    status.innerHTML = msg;
-    status.className = 'status-line' + (type ? ` ${type}` : '');
+  function showStatus(el, msg, type = '') {
+    el.innerHTML = msg;
+    el.className = 'status-line' + (type ? ` ${type}` : '');
   }
 
   function escHtml(s) {
