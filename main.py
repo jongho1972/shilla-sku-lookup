@@ -66,8 +66,9 @@ def _fetch_product(sku: str) -> dict:
     code = hit.get("code", "")
     brand_cat = hit.get("brandCategory") or {}
     brand_kr = (hit.get("brandName") or brand_cat.get("brandName") or "").strip()
-    # brandCategory.enName 이 가장 신뢰도 높은 영문명 소스
     brand_en = (brand_cat.get("enName") or "").strip()
+
+    category = ""  # 상세 페이지 breadcrumb에서 파싱
 
     product_name = hit.get("productNameForDisp") or hit.get("name") or ""
 
@@ -89,6 +90,11 @@ def _fetch_product(sku: str) -> dict:
                     if " | " in ib_text:
                         brand_kr, brand_en = [b.strip() for b in ib_text.split(" | ", 1)]
 
+            # 상품유형: 브레드크럼 마지막 활성 항목 (가장 세분화된 카테고리)
+            bc_items = soup.select("ul.breadcrumb_box li.on")
+            if bc_items:
+                category = bc_items[-1].get_text(strip=True)
+
             # REF.NO / SKU.NO / 상품 문의
             for s in soup.select("strong.number_title"):
                 label = s.get_text(strip=True)
@@ -109,6 +115,7 @@ def _fetch_product(sku: str) -> dict:
         "ref_no": ref_no,
         "brand_kr": brand_kr,
         "brand_en": brand_en,
+        "category": category,
         "product_name": product_name,
         "phone": phone,
         "detail_url": SHILLA_DETAIL_PC.format(code=code) if code else "",

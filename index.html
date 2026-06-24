@@ -344,6 +344,7 @@
               <th>SKU.NO</th>
               <th>국문 브랜드명</th>
               <th>영문 브랜드명</th>
+              <th>상품유형</th>
               <th>상품명</th>
               <th>REF.NO</th>
               <th>상품 문의</th>
@@ -453,12 +454,13 @@
   /* ── CSV 저장 ── */
   function downloadCSV() {
     if (!currentBatchData.length) return;
-    const headers = ['#', 'SKU.NO', '국문 브랜드명', '영문 브랜드명', '상품명', 'REF.NO', '상품 문의', '상품 페이지'];
+    const headers = ['#', 'SKU.NO', '국문 브랜드명', '영문 브랜드명', '상품유형', '상품명', 'REF.NO', '상품 문의', '상품 페이지'];
     const rows = currentBatchData.map((r, i) => [
       i + 1,
       r.sku          || '',
       r.brand_kr     || '',
       r.brand_en     || '',
+      r.category     || '',
       r.product_name || '',
       r.ref_no       || '',
       r.phone        || '',
@@ -466,8 +468,8 @@
     ]);
     const csv = [headers, ...rows]
       .map((row, ri) => row.map((cell, ci) => {
-        // SKU.NO(ci=1), REF.NO(ci=5)는 ="값" 수식으로 감싸 Excel 텍스트 강제
-        if (ri > 0 && (ci === 1 || ci === 5)) return `="${String(cell).replace(/"/g, '""')}"`;
+        // SKU.NO(ci=1), REF.NO(ci=6)는 ="값" 수식으로 감싸 Excel 텍스트 강제
+        if (ri > 0 && (ci === 1 || ci === 6)) return `="${String(cell).replace(/"/g, '""')}"`;
         return `"${String(cell).replace(/"/g, '""')}"`;
       }).join(','))
       .join('\r\n');
@@ -489,6 +491,7 @@
     const rows = [
       ['국문 브랜드명', d.brand_kr    || '—', ''],
       ['영문 브랜드명', d.brand_en    || '—', 'td-brand-en'],
+      ['상품유형',      d.category    || '—', ''],
       ['상품명',        d.product_name|| '—', ''],
       ['REF.NO',        d.ref_no      || '—', 'td-ref'],
       ['SKU.NO',        d.sku         || '—', ''],
@@ -515,7 +518,7 @@
         return `<tr class="bt-error">
           <td class="bt-num">${i + 1}</td>
           <td class="bt-sku">${escHtml(r.sku)}</td>
-          <td colspan="5" style="color:var(--slate-400);font-style:italic">조회 실패</td>
+          <td colspan="6" style="color:var(--slate-400);font-style:italic">조회 실패</td>
           <td></td></tr>`;
       }
       const lnk = r.detail_url
@@ -525,6 +528,7 @@
         <td class="bt-sku">${escHtml(r.sku || '')}</td>
         <td>${escHtml(r.brand_kr || '—')}</td>
         <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
+        <td>${escHtml(r.category || '—')}</td>
         <td>${escHtml(r.product_name || '—')}</td>
         <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
         <td>${escHtml(r.phone || '—')}</td>
