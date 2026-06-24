@@ -1,0 +1,43 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '*.md'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-sku
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and redeploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            cd /opt/j-hawk/shilla-sku-lookup
+            git fetch origin main
+            git reset --hard origin/main
+            cd /opt/j-hawk/deploy
+            docker compose build sku
+            docker compose up -d sku
+            sleep 10
+            docker compose ps sku
+
+      - name: Healthcheck
+        run: |
+          for i in {1..6}; do
+            if curl -fsS https://sku.jhawk.kr/healthz; then
+              echo "OK"; exit 0
+            fi
+            sleep 10
+          done
+          echo "Healthcheck failed"; exit 1
