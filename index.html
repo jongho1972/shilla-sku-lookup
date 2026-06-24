@@ -215,9 +215,18 @@
       border-radius: 8px; background: #fff;
     }
     .batch-table {
-      width: 100%; min-width: 700px;
+      width: 100%; min-width: 860px;
       border-collapse: collapse; font-size: 13px;
     }
+    /* 마지막 열(링크) 우측 고정 */
+    .batch-table th:last-child,
+    .batch-table td:last-child {
+      position: sticky; right: 0;
+      background: #fff;
+      box-shadow: -4px 0 8px rgba(11,46,92,0.08);
+      z-index: 1;
+    }
+    .batch-table thead th:last-child { background: var(--slate-050); }
     .batch-table thead th {
       padding: 10px 12px; text-align: left; white-space: nowrap;
       font-size: 11px; font-weight: 700;
