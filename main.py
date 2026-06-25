@@ -60,8 +60,8 @@ def _fetch_product(sku: str) -> dict:
     if not results:
         return {}
 
-    # SKU가 응답 JSON에 그대로 포함된 항목을 우선 선택, 없으면 첫 번째
-    hit = next((it for it in results if sku in json.dumps(it)), results[0])
+    # skuNo 필드로 정확 매칭 우선, 없으면 첫 번째
+    hit = next((it for it in results if it.get("skuNo") == sku), results[0])
 
     code = hit.get("code", "")
     brand_cat = hit.get("brandCategory") or {}
@@ -72,10 +72,10 @@ def _fetch_product(sku: str) -> dict:
 
     product_name = hit.get("productNameForDisp") or hit.get("name") or ""
 
-    # 3. 상세 페이지에서 영문 브랜드명, REF.NO, 전화번호 파싱
+    # 3. 상세 페이지에서 영문 브랜드명, 전화번호 파싱 (REF.NO는 API 응답에서 직접 사용)
     #    - strong.info_brand: "한글명 | 영문명"
-    #    - strong.number_title → 부모 li 텍스트: REF.NO / SKU.NO / 상품 문의
-    ref_no = code
+    #    - strong.number_title → 부모 li 텍스트: 상품 문의
+    ref_no = hit.get("refNo", "") or code
     phone = ""
     if code:
         try:
@@ -95,12 +95,12 @@ def _fetch_product(sku: str) -> dict:
             if bc_items:
                 category = bc_items[-1].get_text(strip=True)
 
-            # REF.NO / SKU.NO / 상품 문의
+            # 상품 문의 전화번호 파싱
             for s in soup.select("strong.number_title"):
                 label = s.get_text(strip=True)
                 li = s.parent
                 value = li.get_text(strip=True).replace(label, "", 1).strip()
-                if "REF" in label.upper():
+                if "REF" in label.upper() and not hit.get("refNo"):
                     ref_no = value or ref_no
                 elif "문의" in label:
                     m2 = _PHONE_RE.search(value)
