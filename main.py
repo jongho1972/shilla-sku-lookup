@@ -60,8 +60,10 @@ def _fetch_product(sku: str) -> dict:
     if not results:
         return {}
 
-    # skuNo 필드로 정확 매칭 우선, 없으면 첫 번째
-    hit = next((it for it in results if it.get("skuNo") == sku), results[0])
+    # skuNo 필드로 정확 매칭, 없으면 미조회 처리
+    hit = next((it for it in results if it.get("skuNo") == sku), None)
+    if not hit:
+        return {}
 
     code = hit.get("code", "")
     brand_cat = hit.get("brandCategory") or {}
