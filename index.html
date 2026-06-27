@@ -307,7 +307,7 @@
 <div class="container">
 
   <h1 class="page-title">신라면세점 SKU 조회</h1>
-  <p class="page-desc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품문의 전화번호</p>
+  <p class="page-desc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호</p>
 
   <!-- ────────────── 단건 조회 ────────────── -->
   <div class="section-box">
@@ -560,7 +560,7 @@
   function renderBatchTable(rows) {
     const ok   = rows.filter(r => !r.error).length;
     const fail = rows.filter(r =>  r.error).length;
-    batchMeta.textContent = `총 ${rows.length}개 조회 — 성공 ${ok}건` + (fail ? ` / 조회 실패 ${fail}건` : '');
+    batchMeta.textContent = `총 ${rows.length}개 조회 — 성공 ${ok}개` + (fail ? ` / 조회 실패 ${fail}개` : '');
     batchBody.innerHTML = rows.map((r, i) => {
       if (r.error) {
         return `<tr class="bt-error">
