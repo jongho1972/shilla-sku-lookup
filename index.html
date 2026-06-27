@@ -221,23 +221,16 @@
     .price-btn:disabled { opacity: 0.4; cursor: default; }
 
     .batch-scroll {
-      overflow-x: auto;
-      max-width: 100%;
+      overflow-x: scroll;
+      scrollbar-width: thin;
+      scrollbar-color: var(--slate-200) transparent;
       border: 1px solid var(--slate-200);
       border-left: 4px solid var(--navy-900);
       border-radius: 8px; background: #fff;
     }
     .batch-table {
-      min-width: 1080px;
+      min-width: 800px;
       border-collapse: collapse; font-size: 13px;
-    }
-    /* 마지막 열(링크) 우측 고정 */
-    .batch-table th:last-child,
-    .batch-table td:last-child {
-      position: sticky; right: 0;
-      background: #fff;
-      box-shadow: -4px 0 8px rgba(11,46,92,0.08);
-      z-index: 1;
     }
     .batch-table thead th:last-child { background: var(--slate-050); }
     .batch-table thead th {
@@ -283,12 +276,22 @@
     .site-footer a { color: var(--slate-400); text-decoration: none; }
     .site-footer a:hover { color: var(--slate-500); }
 
+    .batch-scroll::-webkit-scrollbar { height: 6px; }
+    .batch-scroll::-webkit-scrollbar-thumb { background: var(--slate-200); border-radius: 3px; }
+    .batch-scroll::-webkit-scrollbar-track { background: transparent; }
+
+    @media (max-width: 800px) {
+      .batch-table { min-width: 720px; }
+    }
     @media (max-width: 560px) {
       .container { padding: 1.75rem 1rem 3rem; }
       h1.page-title { font-size: 1.5rem; }
       .input-row { flex-direction: column; }
       .btn-group { flex-direction: row; }
       .search-btn, .reset-btn { flex: 1; justify-content: center; }
+      .batch-table { min-width: 700px; font-size: 11px; }
+      .batch-table thead th, .batch-table td { padding: 7px 8px; }
+      .batch-toolbar { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
   </style>
 </head>
@@ -345,42 +348,42 @@
       </div>
     </div>
     <div class="status-line" id="batchStatus"></div>
+  </div>
 
-    <div class="batch-result" id="batchResult">
-      <div class="batch-toolbar">
-        <span class="batch-meta" id="batchMeta"></span>
-        <div style="display:flex;gap:6px;align-items:center">
-          <button class="price-btn" id="priceCompareBtn" onclick="openPriceCompare()" disabled>
-            면세점별 가격비교 ↗
-          </button>
-          <button class="csv-btn" onclick="downloadCSV()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-              <polyline points="7 10 12 15 17 10"/>
-              <line x1="12" y1="15" x2="12" y2="3"/>
-            </svg>
-            CSV 저장
-          </button>
-        </div>
+  <div class="batch-result" id="batchResult">
+    <div class="batch-toolbar">
+      <span class="batch-meta" id="batchMeta"></span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button class="price-btn" id="priceCompareBtn" onclick="openPriceCompare()" disabled>
+          면세점별 가격비교 ↗
+        </button>
+        <button class="csv-btn" onclick="downloadCSV()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          CSV 저장
+        </button>
       </div>
-      <div class="batch-scroll">
-        <table class="batch-table">
-          <thead>
-            <tr>
-              <th class="bt-num">#</th>
-              <th>SKU.NO</th>
-              <th>국문 브랜드명</th>
-              <th>영문 브랜드명</th>
-              <th>상품유형</th>
-              <th>상품명</th>
-              <th>REF.NO</th>
-              <th>상품 문의</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="batchBody"></tbody>
-        </table>
-      </div>
+    </div>
+    <div class="batch-scroll">
+      <table class="batch-table">
+        <thead>
+          <tr>
+            <th class="bt-num">#</th>
+            <th>SKU.NO</th>
+            <th>국문 브랜드명</th>
+            <th>영문 브랜드명</th>
+            <th>상품유형</th>
+            <th>상품명</th>
+            <th>REF.NO</th>
+            <th>상품 문의</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="batchBody"></tbody>
+      </table>
     </div>
   </div>
 
