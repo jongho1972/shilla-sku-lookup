@@ -229,7 +229,7 @@
       border-radius: 8px; background: #fff;
     }
     .batch-table {
-      min-width: 800px;
+      min-width: 960px;
       border-collapse: collapse; font-size: 13px;
     }
     .batch-table thead th:last-child { background: var(--slate-050); }
@@ -247,6 +247,8 @@
     .bt-sku   { font-family: "SF Mono","Fira Code",monospace; font-size: 12px;
                 color: var(--slate-700); letter-spacing: 0.03em; }
     .bt-brand-en { font-weight: 700; letter-spacing: 0.04em; }
+    .bt-cat   { min-width: 90px; white-space: nowrap; }
+    .bt-name  { min-width: 260px; }
     .bt-ref   { color: var(--navy-900); font-weight: 600; letter-spacing: 0.04em; }
     .bt-error td { color: var(--slate-400) !important; }
 
@@ -568,8 +570,8 @@
         <td class="bt-sku">${escHtml(r.sku || '')}</td>
         <td>${escHtml(r.brand_kr || '—')}</td>
         <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
-        <td>${escHtml(r.category || '—')}</td>
-        <td>${escHtml(r.product_name || '—')}</td>
+        <td class="bt-cat">${escHtml(r.category || '—')}</td>
+        <td class="bt-name">${escHtml(r.product_name || '—')}</td>
         <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
         <td>${escHtml(r.phone || '—')}</td>
         <td>${lnk}</td></tr>`;
