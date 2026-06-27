@@ -208,6 +208,18 @@
     }
     .csv-btn:hover { background: var(--blue-025); }
 
+    .price-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 5px;
+      font-size: 12px; font-weight: 600;
+      background: var(--navy-900); color: #fff;
+      border: 1px solid var(--navy-900); cursor: pointer;
+      font-family: inherit; letter-spacing: -0.01em;
+      transition: background 0.15s, opacity 0.15s;
+    }
+    .price-btn:hover:not(:disabled) { background: var(--navy-700); }
+    .price-btn:disabled { opacity: 0.4; cursor: default; }
+
     .batch-scroll {
       overflow-x: auto;
       border: 1px solid var(--slate-200);
@@ -336,14 +348,19 @@
     <div class="batch-result" id="batchResult">
       <div class="batch-toolbar">
         <span class="batch-meta" id="batchMeta"></span>
-        <button class="csv-btn" onclick="downloadCSV()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          CSV 저장
-        </button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="price-btn" id="priceCompareBtn" onclick="openPriceCompare()" disabled>
+            면세점별 가격비교 ↗
+          </button>
+          <button class="csv-btn" onclick="downloadCSV()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            CSV 저장
+          </button>
+        </div>
       </div>
       <div class="batch-scroll">
         <table class="batch-table">
@@ -380,12 +397,13 @@
   const tbl          = document.getElementById('resultTable');
   const link         = document.getElementById('detailLink');
 
-  const batchInput  = document.getElementById('batchInput');
-  const batchBtn    = document.getElementById('batchBtn');
-  const batchStatus = document.getElementById('batchStatus');
-  const batchResult = document.getElementById('batchResult');
-  const batchBody   = document.getElementById('batchBody');
-  const batchMeta   = document.getElementById('batchMeta');
+  const batchInput       = document.getElementById('batchInput');
+  const batchBtn         = document.getElementById('batchBtn');
+  const batchStatus      = document.getElementById('batchStatus');
+  const batchResult      = document.getElementById('batchResult');
+  const batchBody        = document.getElementById('batchBody');
+  const batchMeta        = document.getElementById('batchMeta');
+  const priceCompareBtn  = document.getElementById('priceCompareBtn');
 
   let currentBatchData = [];
 
@@ -409,6 +427,14 @@
     showStatus(batchStatus, '');
     batchResult.classList.remove('show');
     currentBatchData = [];
+    priceCompareBtn.disabled = true;
+  }
+
+  /* ── 면세점별 가격비교 열기 ── */
+  function openPriceCompare() {
+    const skus = currentBatchData.filter(r => !r.error).map(r => r.sku);
+    if (!skus.length) return;
+    window.open('https://dfprice.jhawk.kr/?skus=' + skus.join(','), '_blank');
   }
 
   /* ── 단건 조회 ── */
@@ -452,6 +478,7 @@
       if (!res.ok) { showStatus(batchStatus, data.detail || '조회 실패', 'error'); return; }
       currentBatchData = data;
       renderBatchTable(data);
+      priceCompareBtn.disabled = data.filter(r => !r.error).length === 0;
       showStatus(batchStatus, '');
     } catch {
       showStatus(batchStatus, '서버에 연결할 수 없습니다', 'error');
