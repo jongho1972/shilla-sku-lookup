@@ -188,8 +188,14 @@
     .detail-link:hover { background: var(--navy-700); }
 
     /* ── 다건 결과 테이블 ── */
-    .batch-result { display: none; margin-top: 1.25rem; }
-    .batch-result.show { display: block; }
+    .batch-result { display: none; margin-top: 1.5rem; }
+    .batch-result.show {
+      display: block;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(96vw, 1200px);
+    }
 
     .batch-toolbar {
       display: flex; align-items: center; justify-content: space-between;
@@ -221,7 +227,7 @@
     .price-btn:disabled { opacity: 0.4; cursor: default; }
 
     .batch-scroll {
-      overflow-x: scroll;
+      overflow-x: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--slate-200) transparent;
       border: 1px solid var(--slate-200);
@@ -229,7 +235,7 @@
       border-radius: 8px; background: #fff;
     }
     .batch-table {
-      min-width: 960px;
+      width: 100%; min-width: 960px;
       border-collapse: collapse; font-size: 13px;
     }
     .batch-table thead th:last-child { background: var(--slate-050); }
