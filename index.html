@@ -218,13 +218,13 @@
       display: inline-flex; align-items: center; gap: 5px;
       padding: 8px 16px; border-radius: 8px;
       font-size: 12px; font-weight: 700;
-      background: #fff; color: var(--navy-900);
-      border: 1.5px solid var(--slate-200); cursor: pointer;
+      background: var(--navy-900); color: #fff;
+      border: 1.5px solid var(--navy-900); cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em;
-      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+      transition: background 0.15s, opacity 0.15s;
     }
-    .price-btn:hover:not(:disabled) { background: var(--blue-025); border-color: var(--navy-700); }
-    .price-btn:disabled { opacity: 0.4; cursor: default; }
+    .price-btn:hover:not(:disabled) { background: var(--navy-700); border-color: var(--navy-700); }
+    .price-btn:disabled { opacity: 0.35; cursor: default; }
 
     .batch-scroll {
       overflow-x: auto;
