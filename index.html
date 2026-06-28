@@ -194,78 +194,78 @@
       position: relative;
       left: 50%;
       transform: translateX(-50%);
-      width: min(96vw, 1600px);
+      width: min(96vw, 1500px);
     }
 
     .batch-toolbar {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     .batch-meta { font-size: 13px; color: var(--slate-500); letter-spacing: -0.01em; }
 
     .csv-btn {
       display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 12px; border-radius: 5px;
-      font-size: 12px; font-weight: 600;
+      padding: 8px 16px; border-radius: 8px;
+      font-size: 12px; font-weight: 700;
       background: #fff; color: var(--navy-900);
-      border: 1px solid var(--navy-900); cursor: pointer;
+      border: 1.5px solid var(--slate-200); cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em;
-      transition: background 0.15s;
+      transition: background 0.15s, border-color 0.15s;
     }
-    .csv-btn:hover { background: var(--blue-025); }
+    .csv-btn:hover { background: var(--blue-025); border-color: var(--navy-700); }
 
     .price-btn {
       display: inline-flex; align-items: center; gap: 5px;
-      padding: 5px 12px; border-radius: 5px;
-      font-size: 12px; font-weight: 600;
-      background: var(--navy-900); color: #fff;
-      border: 1px solid var(--navy-900); cursor: pointer;
+      padding: 8px 16px; border-radius: 8px;
+      font-size: 12px; font-weight: 700;
+      background: #fff; color: var(--navy-900);
+      border: 1.5px solid var(--slate-200); cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em;
-      transition: background 0.15s, opacity 0.15s;
+      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
     }
-    .price-btn:hover:not(:disabled) { background: var(--navy-700); }
+    .price-btn:hover:not(:disabled) { background: var(--blue-025); border-color: var(--navy-700); }
     .price-btn:disabled { opacity: 0.4; cursor: default; }
 
     .batch-scroll {
       overflow-x: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--slate-200) transparent;
-      border: 1px solid var(--slate-200);
-      border-left: 4px solid var(--navy-900);
-      border-radius: 8px; background: #fff;
+      border: 1px solid var(--slate-100);
+      border-radius: 12px; background: #fff;
     }
     .batch-table {
       width: 100%; min-width: 1100px;
-      border-collapse: collapse; font-size: 13px;
+      border-collapse: collapse; font-size: 0.95rem;
     }
-    .batch-table thead th:last-child { background: var(--slate-050); }
+    .batch-table thead th:last-child { background: var(--blue-025); }
     .batch-table thead th {
-      padding: 10px 12px; text-align: left; white-space: nowrap;
-      font-size: 11px; font-weight: 700;
-      color: var(--slate-500); letter-spacing: 0.02em; text-transform: uppercase;
-      background: var(--slate-050); border-bottom: 1px solid var(--slate-100);
+      padding: 12px 16px; text-align: left; white-space: nowrap;
+      font-size: 0.875rem; font-weight: 700;
+      color: var(--navy-900); letter-spacing: -0.01em;
+      background: var(--blue-025); border-bottom: 1px solid var(--slate-100);
     }
-    .batch-table tbody tr:not(:last-child) td { border-bottom: 1px solid var(--slate-050); }
-    .batch-table tbody tr:hover td { background: var(--blue-025); }
-    .batch-table td { padding: 9px 12px; vertical-align: middle; color: #111827; font-weight: 500; }
+    .batch-table tbody tr:not(:last-child) td { border-bottom: 1px solid var(--slate-100); }
+    .batch-table td { padding: 14px 16px; vertical-align: middle; color: #111827; font-weight: 500; }
 
-    .bt-num   { color: var(--slate-400); font-size: 11px; font-weight: 700; width: 28px; }
-    .bt-sku   { font-family: "SF Mono","Fira Code",monospace; font-size: 12px;
-                color: var(--slate-700); letter-spacing: 0.03em; }
+    .bt-num   { color: var(--slate-400); font-size: 0.8rem; font-weight: 700; width: 36px; text-align: center; }
+    .bt-sku   { font-family: ui-monospace,"SF Mono","Fira Code",monospace; font-size: 0.88rem;
+                font-weight: 700; color: var(--navy-900); letter-spacing: 0.03em; white-space: nowrap; }
     .bt-brand-en { font-weight: 700; letter-spacing: 0.04em; }
     .bt-cat   { min-width: 90px; white-space: nowrap; }
-    .bt-name  { min-width: 260px; }
-    .bt-ref   { color: var(--navy-900); font-weight: 600; letter-spacing: 0.04em; }
+    .bt-name  { font-weight: 600; color: var(--navy-900); min-width: 200px; }
+    .bt-ref   { font-family: ui-monospace,"SF Mono","Fira Code",monospace; font-size: 0.85rem;
+                color: var(--slate-700); white-space: nowrap; }
     .bt-error td { color: var(--slate-400) !important; }
 
     .bt-link {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 26px; height: 26px;
-      border: 1px solid var(--slate-200); border-radius: 4px;
-      color: var(--slate-400); text-decoration: none; font-size: 13px;
-      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      display: inline-block;
+      font-weight: 600; font-size: 0.8rem;
+      color: var(--blue-500); text-decoration: none;
+      border: 1px solid var(--slate-200); border-radius: 5px;
+      padding: 2px 7px; white-space: nowrap;
+      transition: background 0.12s, border-color 0.12s;
     }
-    .bt-link:hover { border-color: var(--navy-700); color: var(--navy-700); background: var(--blue-025); }
+    .bt-link:hover { background: var(--blue-025); border-color: var(--blue-500); }
 
     /* ── 스피너 ── */
     .spinner {
@@ -289,7 +289,7 @@
     .batch-scroll::-webkit-scrollbar-track { background: transparent; }
 
     @media (max-width: 800px) {
-      .batch-table { min-width: 720px; }
+      .batch-table { min-width: 800px; }
     }
     @media (max-width: 560px) {
       .container { padding: 1.75rem 1rem 3rem; }
@@ -297,8 +297,8 @@
       .input-row { flex-direction: column; }
       .btn-group { flex-direction: row; }
       .search-btn, .reset-btn { flex: 1; justify-content: center; }
-      .batch-table { min-width: 700px; font-size: 11px; }
-      .batch-table thead th, .batch-table td { padding: 7px 8px; }
+      .batch-table { min-width: 700px; font-size: 0.82rem; }
+      .batch-table thead th, .batch-table td { padding: 9px 10px; }
       .batch-toolbar { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
   </style>
@@ -570,7 +570,7 @@
           <td></td></tr>`;
       }
       const lnk = r.detail_url
-        ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank" title="상품 페이지">↗</a>` : '';
+        ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank">신라 ↗</a>` : '';
       return `<tr>
         <td class="bt-num">${i + 1}</td>
         <td class="bt-sku">${escHtml(r.sku || '')}</td>
