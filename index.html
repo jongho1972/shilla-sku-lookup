@@ -175,8 +175,19 @@
     .result-footer {
       margin-top: 12px; padding-top: 12px;
       border-top: 1px solid var(--slate-100);
-      display: flex; justify-content: flex-end;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
+    .bulk-copy-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+      background: #fff; color: var(--slate-700);
+      border: 1.5px solid var(--slate-200); cursor: pointer;
+      font-family: inherit; letter-spacing: -0.01em;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .bulk-copy-btn:hover { border-color: var(--navy-700); color: var(--navy-900); background: var(--blue-025); }
+    .bulk-copy-btn.copied { border-color: var(--green-700); color: var(--green-700); background: #F0FDF4; }
     .detail-link {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; border-radius: 6px;
@@ -333,6 +344,10 @@
     <div class="result-card show" id="resultCard">
       <table class="result-table" id="resultTable"></table>
       <div class="result-footer">
+        <button class="bulk-copy-btn" id="bulkCopyBtn" onclick="copyBulkFormat()" style="display:none">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          일괄복사
+        </button>
         <a id="detailLink" href="#" target="_blank" class="detail-link" style="display:none">상품 페이지 열기 ↗</a>
       </div>
     </div>
@@ -416,8 +431,10 @@
   const batchBody        = document.getElementById('batchBody');
   const batchMeta        = document.getElementById('batchMeta');
   const priceCompareBtn  = document.getElementById('priceCompareBtn');
+  const bulkCopyBtn      = document.getElementById('bulkCopyBtn');
 
-  let currentBatchData = [];
+  let currentBatchData  = [];
+  let currentSingleData = {};
 
   singleInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSingle(); });
 
@@ -553,7 +570,34 @@
     }).join('');
     link.href = d.detail_url || '#';
     link.style.display = d.detail_url ? 'inline-flex' : 'none';
+    currentSingleData = d;
+    bulkCopyBtn.style.display = d.sku ? 'inline-flex' : 'none';
+    bulkCopyBtn.textContent = '';
+    bulkCopyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 일괄복사`;
+    bulkCopyBtn.classList.remove('copied');
     card.classList.add('show');
+  }
+
+  /* ── 일괄복사 ── */
+  function copyBulkFormat() {
+    const d = currentSingleData;
+    const text = [
+      '# 이름 : ',
+      `# SKU : ${d.sku || ''}`,
+      `# REF : ${d.ref_no || ''}`,
+      `# 상품명 : ${d.product_name || ''}`,
+      '# Bill : ',
+      '# 내용',
+      '    > ',
+    ].join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      bulkCopyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 복사됨!`;
+      bulkCopyBtn.classList.add('copied');
+      setTimeout(() => {
+        bulkCopyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 일괄복사`;
+        bulkCopyBtn.classList.remove('copied');
+      }, 1500);
+    });
   }
 
   /* ── 다건 렌더 ── */
