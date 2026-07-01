@@ -171,14 +171,12 @@ def _search_keyword(keyword: str, size: int = 20) -> list[dict]:
         brand_kr = (it.get("brandName") or brand_cat.get("brandName") or "").strip()
         brand_en = (brand_cat.get("enName") or "").strip()
         code = it.get("code", "")
-        discount = it.get("discountRate")
         items.append({
             "sku": it.get("skuNo", ""),
             "brand_kr": brand_kr,
             "brand_en": brand_en,
             "product_name": it.get("productNameForDisp") or it.get("name") or "",
             "ref_no": it.get("refNo", "") or code,
-            "discount_rate": discount if discount else None,
             "soldout": it.get("soldOutYn") == "Y",
             "detail_url": SHILLA_DETAIL_PC.format(code=code) if code else "",
         })

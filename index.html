@@ -398,7 +398,6 @@
             <th>영문 브랜드명</th>
             <th>상품명</th>
             <th>REF.NO</th>
-            <th style="text-align:right">할인율</th>
             <th></th>
           </tr>
         </thead>
@@ -547,10 +546,9 @@
   function renderKeywordTable(rows, kw) {
     keywordMeta.textContent = `"${kw}" 검색 결과 ${rows.length}개`;
     keywordBody.innerHTML = rows.map((r, i) => {
-      const lnk      = r.detail_url
+      const lnk     = r.detail_url
         ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank">신라 ↗</a>` : '';
-      const discount = r.discount_rate != null ? `${r.discount_rate}%` : '—';
-      const soldout  = r.soldout
+      const soldout = r.soldout
         ? ' <span style="color:var(--red-600);font-size:0.75rem">(품절)</span>' : '';
       return `<tr>
         <td class="bt-num">${i + 1}</td>
@@ -559,7 +557,6 @@
         <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
         <td class="bt-name">${escHtml(r.product_name || '—')}${soldout}</td>
         <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
-        <td style="text-align:right;font-weight:700;color:var(--navy-900)">${escHtml(discount)}</td>
         <td>${lnk}</td></tr>`;
     }).join('');
     keywordResult.classList.add('show');
@@ -569,7 +566,7 @@
   function downloadKeywordCSV() {
     if (!currentKeywordData.length) return;
     const kw = keywordInput.value.trim();
-    const headers = ['#', 'SKU.NO', '국문 브랜드명', '영문 브랜드명', '상품명', 'REF.NO', '할인율', '상품 페이지'];
+    const headers = ['#', 'SKU.NO', '국문 브랜드명', '영문 브랜드명', '상품명', 'REF.NO', '상품 페이지'];
     const rows = currentKeywordData.map((r, i) => [
       i + 1,
       r.sku          || '',
@@ -577,7 +574,6 @@
       r.brand_en     || '',
       r.product_name || '',
       r.ref_no       || '',
-      r.discount_rate != null ? `${r.discount_rate}%` : '',
       r.detail_url   || '',
     ]);
     const csv = [headers, ...rows]
