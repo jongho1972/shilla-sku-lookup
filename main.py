@@ -82,8 +82,8 @@ def _fetch_product(sku: str) -> dict:
     # 검색 API 응답의 "코드:카테고리명" 목록에서 카테고리명 추출 (2뎁스가 더 구체적이면 우선)
     category = ""
     for cat_key in ("disp2DepthCategoryList", "disp1DepthCategoryList"):
-        cat_items = hit.get(cat_key) or []
-        if cat_items:
+        cat_items = hit.get(cat_key)
+        if isinstance(cat_items, list) and cat_items:
             last = str(cat_items[-1])
             category = last.split(":", 1)[-1].strip() if ":" in last else last.strip()
             if category:
