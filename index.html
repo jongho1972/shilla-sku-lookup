@@ -544,7 +544,7 @@
 
   /* ── 키워드 결과 렌더 ── */
   function renderKeywordTable(rows, kw) {
-    rows.sort((a, b) => (a.brand_kr || '').localeCompare(b.brand_kr || '', 'ko'));
+    rows.sort((a, b) => (a.product_name || '').localeCompare(b.product_name || '', 'ko'));
     keywordMeta.textContent = `"${kw}" 검색 결과 ${rows.length}개`;
     keywordBody.innerHTML = rows.map((r, i) => {
       const lnk     = r.detail_url
