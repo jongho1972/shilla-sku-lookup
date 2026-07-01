@@ -198,8 +198,10 @@
     }
     .detail-link:hover { background: var(--navy-700); }
 
-    /* ── 다건 결과 테이블 ── */
+    /* ── 키워드·다건 결과 테이블 공통 ── */
+    .keyword-result,
     .batch-result { display: none; margin-top: 1.5rem; }
+    .keyword-result.show,
     .batch-result.show {
       display: block;
       position: relative;
@@ -353,6 +355,58 @@
     </div>
   </div>
 
+  <!-- ────────────── 키워드 검색 ────────────── -->
+  <div class="section-box">
+    <h3>키워드 검색</h3>
+    <p class="section-desc">상품명 키워드 입력 → 일치하는 상품 목록 조회 (최대 20개) — SKU·브랜드·할인율 확인 가능</p>
+
+    <div class="input-row">
+      <input
+        id="keywordInput"
+        class="sku-input"
+        type="text"
+        placeholder="예: 에스티로더 나이트리페어"
+        autocomplete="off" spellcheck="false"
+      />
+      <div class="btn-group-row">
+        <button class="search-btn" id="keywordBtn" onclick="doKeyword()">검색</button>
+        <button class="reset-btn" onclick="resetKeyword()">초기화</button>
+      </div>
+    </div>
+    <div class="status-line" id="keywordStatus"></div>
+  </div>
+
+  <div class="keyword-result" id="keywordResult">
+    <div class="batch-toolbar">
+      <span class="batch-meta" id="keywordMeta"></span>
+      <button class="csv-btn" onclick="downloadKeywordCSV()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        CSV 저장
+      </button>
+    </div>
+    <div class="batch-scroll">
+      <table class="batch-table">
+        <thead>
+          <tr>
+            <th class="bt-num">#</th>
+            <th>SKU.NO</th>
+            <th>국문 브랜드명</th>
+            <th>영문 브랜드명</th>
+            <th>상품명</th>
+            <th>REF.NO</th>
+            <th style="text-align:right">할인율</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="keywordBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ────────────── 다건 조회 ────────────── -->
   <div class="section-box">
     <h3>다건 조회</h3>
@@ -424,6 +478,14 @@
   const tbl          = document.getElementById('resultTable');
   const link         = document.getElementById('detailLink');
 
+  const keywordInput  = document.getElementById('keywordInput');
+  const keywordBtn    = document.getElementById('keywordBtn');
+  const keywordStatus = document.getElementById('keywordStatus');
+  const keywordResult = document.getElementById('keywordResult');
+  const keywordBody   = document.getElementById('keywordBody');
+  const keywordMeta   = document.getElementById('keywordMeta');
+  let currentKeywordData = [];
+
   const batchInput       = document.getElementById('batchInput');
   const batchBtn         = document.getElementById('batchBtn');
   const batchStatus      = document.getElementById('batchStatus');
@@ -437,6 +499,7 @@
   let currentSingleData = {};
 
   singleInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSingle(); });
+  keywordInput.addEventListener('keydown', e => { if (e.key === 'Enter') doKeyword(); });
 
   /* 초기 빈 카드 표시 */
   renderSingleResult({});
@@ -447,6 +510,90 @@
     singleInput.focus();
     showStatus(singleStatus, '');
     renderSingleResult({});
+  }
+
+  /* ── 키워드 초기화 ── */
+  function resetKeyword() {
+    keywordInput.value = '';
+    keywordInput.focus();
+    showStatus(keywordStatus, '');
+    keywordResult.classList.remove('show');
+    currentKeywordData = [];
+  }
+
+  /* ── 키워드 검색 ── */
+  async function doKeyword() {
+    const kw = keywordInput.value.trim();
+    if (!kw) { showStatus(keywordStatus, '검색어를 입력해주세요', 'error'); return; }
+    keywordBtn.disabled = true;
+    keywordResult.classList.remove('show');
+    showStatus(keywordStatus, '<span class="spinner"></span><span>검색 중…</span>');
+    try {
+      const res  = await fetch(`/api/search?keyword=${encodeURIComponent(kw)}`);
+      const data = await res.json();
+      if (!res.ok) { showStatus(keywordStatus, data.detail || '검색 실패', 'error'); return; }
+      if (!data.length) { showStatus(keywordStatus, '검색 결과가 없습니다'); return; }
+      currentKeywordData = data;
+      renderKeywordTable(data, kw);
+      showStatus(keywordStatus, '');
+    } catch {
+      showStatus(keywordStatus, '서버에 연결할 수 없습니다', 'error');
+    } finally {
+      keywordBtn.disabled = false;
+    }
+  }
+
+  /* ── 키워드 결과 렌더 ── */
+  function renderKeywordTable(rows, kw) {
+    keywordMeta.textContent = `"${kw}" 검색 결과 ${rows.length}개`;
+    keywordBody.innerHTML = rows.map((r, i) => {
+      const lnk      = r.detail_url
+        ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank">신라 ↗</a>` : '';
+      const discount = r.discount_rate != null ? `${r.discount_rate}%` : '—';
+      const soldout  = r.soldout
+        ? ' <span style="color:var(--red-600);font-size:0.75rem">(품절)</span>' : '';
+      return `<tr>
+        <td class="bt-num">${i + 1}</td>
+        <td class="bt-sku">${escHtml(r.sku || '—')}</td>
+        <td>${escHtml(r.brand_kr || '—')}</td>
+        <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
+        <td class="bt-name">${escHtml(r.product_name || '—')}${soldout}</td>
+        <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
+        <td style="text-align:right;font-weight:700;color:var(--navy-900)">${escHtml(discount)}</td>
+        <td>${lnk}</td></tr>`;
+    }).join('');
+    keywordResult.classList.add('show');
+  }
+
+  /* ── 키워드 CSV 저장 ── */
+  function downloadKeywordCSV() {
+    if (!currentKeywordData.length) return;
+    const kw = keywordInput.value.trim();
+    const headers = ['#', 'SKU.NO', '국문 브랜드명', '영문 브랜드명', '상품명', 'REF.NO', '할인율', '상품 페이지'];
+    const rows = currentKeywordData.map((r, i) => [
+      i + 1,
+      r.sku          || '',
+      r.brand_kr     || '',
+      r.brand_en     || '',
+      r.product_name || '',
+      r.ref_no       || '',
+      r.discount_rate != null ? `${r.discount_rate}%` : '',
+      r.detail_url   || '',
+    ]);
+    const csv = [headers, ...rows]
+      .map((row, ri) => row.map((cell, ci) => {
+        if (ri > 0 && (ci === 1 || ci === 5)) return `="${String(cell).replace(/"/g, '""')}"`;
+        return `"${String(cell).replace(/"/g, '""')}"`;
+      }).join(','))
+      .join('\r\n');
+    const blob = new Blob(['﻿' + csv], {type: 'text/csv;charset=utf-8;'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    const now  = new Date();
+    const stamp = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+    a.href = url; a.download = `키워드검색_${kw}_${stamp}.csv`;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
   }
 
   /* ── 다건 초기화 ── */

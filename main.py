@@ -34,14 +34,23 @@ _PHONE_RE = re.compile(r"\d{2,3}-\d{3,4}-\d{4}")
 _CSRF_RE = re.compile(r"CSRFToken['\"\s:=]+([0-9a-f-]{36})")
 
 
-def _fetch_product(sku: str) -> dict:
+def _make_session() -> creq.Session:
     sess = creq.Session(impersonate="chrome")
     sess.headers.update({"User-Agent": UA, "Accept-Language": "ko-KR,ko;q=0.9"})
+    return sess
+
+
+def _get_csrf(sess: creq.Session, query: str) -> str:
+    page = sess.get(SHILLA_SEARCH.format(q=query), timeout=15)
+    m = _CSRF_RE.search(page.text)
+    return m.group(1) if m else ""
+
+
+def _fetch_product(sku: str) -> dict:
+    sess = _make_session()
 
     # 1. 검색 페이지에서 CSRF 토큰 획득
-    page = sess.get(SHILLA_SEARCH.format(q=sku), timeout=15)
-    m = _CSRF_RE.search(page.text)
-    token = m.group(1) if m else ""
+    token = _get_csrf(sess, sku)
 
     # 2. SKU로 상품 검색
     body = {
@@ -137,6 +146,56 @@ async def healthz():
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return FileResponse(Path(__file__).parent / "index.html")
+
+
+def _search_keyword(keyword: str, size: int = 20) -> list[dict]:
+    sess = _make_session()
+    token = _get_csrf(sess, keyword)
+
+    body = {
+        "json": json.dumps({
+            "category": "", "size": str(size), "page": 0,
+            "text": keyword, "within": "", "query": keyword,
+            "pagination": "", "condition": {"discountRate": "0"},
+        }, ensure_ascii=False),
+        "CSRFToken": token,
+    }
+    r = sess.post(SHILLA_AJAX, data=body,
+                  headers={"X-Requested-With": "XMLHttpRequest"}, timeout=15)
+    r.raise_for_status()
+    results = r.json().get("results", [])
+
+    items = []
+    for it in results:
+        brand_cat = it.get("brandCategory") or {}
+        brand_kr = (it.get("brandName") or brand_cat.get("brandName") or "").strip()
+        brand_en = (brand_cat.get("enName") or "").strip()
+        code = it.get("code", "")
+        discount = it.get("discountRate")
+        items.append({
+            "sku": it.get("skuNo", ""),
+            "brand_kr": brand_kr,
+            "brand_en": brand_en,
+            "product_name": it.get("productNameForDisp") or it.get("name") or "",
+            "ref_no": it.get("refNo", "") or code,
+            "discount_rate": discount if discount else None,
+            "soldout": it.get("soldOutYn") == "Y",
+            "detail_url": SHILLA_DETAIL_PC.format(code=code) if code else "",
+        })
+    return items
+
+
+@app.get("/api/search")
+async def search_keyword(keyword: str):
+    keyword = keyword.strip()
+    if not keyword:
+        raise HTTPException(status_code=400, detail="검색어를 입력해주세요")
+    if len(keyword) < 2:
+        raise HTTPException(status_code=400, detail="검색어를 2자 이상 입력해주세요")
+
+    loop = asyncio.get_running_loop()
+    results = await loop.run_in_executor(None, _search_keyword, keyword)
+    return results
 
 
 @app.get("/api/lookup")
