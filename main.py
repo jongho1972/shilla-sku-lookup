@@ -148,7 +148,7 @@ async def root():
     return FileResponse(Path(__file__).parent / "index.html")
 
 
-def _search_keyword(keyword: str, size: int = 20) -> list[dict]:
+def _search_keyword(keyword: str, size: int = 50) -> list[dict]:
     sess = _make_session()
     token = _get_csrf(sess, keyword)
 
