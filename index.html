@@ -397,11 +397,11 @@
         <thead>
           <tr>
             <th class="bt-num">#</th>
-            <th>SKU.NO</th>
             <th>국문 브랜드명</th>
             <th>영문 브랜드명</th>
             <th>상품유형</th>
             <th>상품명</th>
+            <th>SKU.NO</th>
             <th>REF.NO</th>
             <th>상품 문의</th>
             <th></th>
@@ -452,6 +452,7 @@
             <th class="bt-num">#</th>
             <th>국문 브랜드명</th>
             <th>영문 브랜드명</th>
+            <th>상품유형</th>
             <th>상품명</th>
             <th>SKU.NO</th>
             <th>REF.NO</th>
@@ -555,6 +556,7 @@
         <td class="bt-num">${i + 1}</td>
         <td>${escHtml(r.brand_kr || '—')}</td>
         <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
+        <td class="bt-cat">${escHtml(r.category || '—')}</td>
         <td class="bt-name">${escHtml(r.product_name || '—')}${soldout}</td>
         <td class="bt-sku">${escHtml(r.sku || '—')}</td>
         <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
@@ -568,11 +570,12 @@
     if (!currentKeywordData.length) return;
     const kw = keywordInput.value.trim();
     const sorted = [...currentKeywordData].sort((a, b) => (a.brand_kr || '').localeCompare(b.brand_kr || '', 'ko'));
-    const headers = ['#', '국문 브랜드명', '영문 브랜드명', '상품명', 'SKU.NO', 'REF.NO', '상품 페이지'];
+    const headers = ['#', '국문 브랜드명', '영문 브랜드명', '상품유형', '상품명', 'SKU.NO', 'REF.NO', '상품 페이지'];
     const rows = sorted.map((r, i) => [
       i + 1,
       r.brand_kr     || '',
       r.brand_en     || '',
+      r.category     || '',
       r.product_name || '',
       r.sku          || '',
       r.ref_no       || '',
@@ -580,7 +583,7 @@
     ]);
     const csv = [headers, ...rows]
       .map((row, ri) => row.map((cell, ci) => {
-        if (ri > 0 && (ci === 4 || ci === 5)) return `="${String(cell).replace(/"/g, '""')}"`;
+        if (ri > 0 && (ci === 5 || ci === 6)) return `="${String(cell).replace(/"/g, '""')}"`;
         return `"${String(cell).replace(/"/g, '""')}"`;
       }).join(','))
       .join('\r\n');
@@ -664,22 +667,22 @@
   /* ── CSV 저장 ── */
   function downloadCSV() {
     if (!currentBatchData.length) return;
-    const headers = ['#', 'SKU.NO', '국문 브랜드명', '영문 브랜드명', '상품유형', '상품명', 'REF.NO', '상품 문의', '상품 페이지'];
+    const headers = ['#', '국문 브랜드명', '영문 브랜드명', '상품유형', '상품명', 'SKU.NO', 'REF.NO', '상품 문의', '상품 페이지'];
     const rows = currentBatchData.map((r, i) => [
       i + 1,
-      r.sku          || '',
       r.brand_kr     || '',
       r.brand_en     || '',
       r.category     || '',
       r.product_name || '',
+      r.sku          || '',
       r.ref_no       || '',
       r.phone        || '',
       r.detail_url   || '',
     ]);
     const csv = [headers, ...rows]
       .map((row, ri) => row.map((cell, ci) => {
-        // SKU.NO(ci=1), REF.NO(ci=6)는 ="값" 수식으로 감싸 Excel 텍스트 강제
-        if (ri > 0 && (ci === 1 || ci === 6)) return `="${String(cell).replace(/"/g, '""')}"`;
+        // SKU.NO(ci=5), REF.NO(ci=6)는 ="값" 수식으로 감싸 Excel 텍스트 강제
+        if (ri > 0 && (ci === 5 || ci === 6)) return `="${String(cell).replace(/"/g, '""')}"`;
         return `"${String(cell).replace(/"/g, '""')}"`;
       }).join(','))
       .join('\r\n');
@@ -702,9 +705,9 @@
       ['국문 브랜드명', d.brand_kr    || '—', ''],
       ['영문 브랜드명', d.brand_en    || '—', 'td-brand-en'],
       ['상품유형',      d.category    || '—', ''],
+      ['상품명',        d.product_name|| '—', ''],
       ['SKU.NO',        d.sku         || '—', ''],
       ['REF.NO',        d.ref_no      || '—', 'td-ref'],
-      ['상품명',        d.product_name|| '—', ''],
       ['상품 문의',     d.phone       || '—', 'td-phone'],
     ];
     tbl.innerHTML = rows.map(([label, value, cls]) => {
@@ -731,8 +734,8 @@
       `# SKU : ${d.sku || ''}`,
       `# REF : ${d.ref_no || ''}`,
       `# 상품명 : ${d.product_name || ''}`,
-      '# Bill :',
-      '# 구매일 :',
+      '# Bill : ',
+      '# 구매일 : ',
       '# 인도일 : ',
       '# VOC 내용',
       '    - ',
@@ -756,19 +759,18 @@
       if (r.error) {
         return `<tr class="bt-error">
           <td class="bt-num">${i + 1}</td>
-          <td class="bt-sku">${escHtml(r.sku)}</td>
-          <td colspan="6" style="color:var(--slate-400);font-style:italic">조회 실패</td>
+          <td colspan="7" style="color:var(--slate-400);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
           <td></td></tr>`;
       }
       const lnk = r.detail_url
         ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank">신라 ↗</a>` : '';
       return `<tr>
         <td class="bt-num">${i + 1}</td>
-        <td class="bt-sku">${escHtml(r.sku || '')}</td>
         <td>${escHtml(r.brand_kr || '—')}</td>
         <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
         <td class="bt-cat">${escHtml(r.category || '—')}</td>
         <td class="bt-name">${escHtml(r.product_name || '—')}</td>
+        <td class="bt-sku">${escHtml(r.sku || '—')}</td>
         <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
         <td>${escHtml(r.phone || '—')}</td>
         <td>${lnk}</td></tr>`;

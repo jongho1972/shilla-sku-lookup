@@ -46,6 +46,18 @@ def _get_csrf(sess: creq.Session, query: str) -> str:
     return m.group(1) if m else ""
 
 
+def _extract_category(hit: dict) -> str:
+    """검색 API 응답의 "코드:카테고리명" 목록에서 카테고리명 추출 (2뎁스가 더 구체적이면 우선)."""
+    for cat_key in ("disp2DepthCategoryList", "disp1DepthCategoryList"):
+        cat_items = hit.get(cat_key)
+        if isinstance(cat_items, list) and cat_items:
+            last = str(cat_items[-1])
+            category = last.split(":", 1)[-1].strip() if ":" in last else last.strip()
+            if category:
+                return category
+    return ""
+
+
 def _fetch_product(sku: str) -> dict:
     sess = _make_session()
 
@@ -79,15 +91,7 @@ def _fetch_product(sku: str) -> dict:
     brand_kr = (hit.get("brandName") or brand_cat.get("brandName") or "").strip()
     brand_en = (brand_cat.get("enName") or "").strip()
 
-    # 검색 API 응답의 "코드:카테고리명" 목록에서 카테고리명 추출 (2뎁스가 더 구체적이면 우선)
-    category = ""
-    for cat_key in ("disp2DepthCategoryList", "disp1DepthCategoryList"):
-        cat_items = hit.get(cat_key)
-        if isinstance(cat_items, list) and cat_items:
-            last = str(cat_items[-1])
-            category = last.split(":", 1)[-1].strip() if ":" in last else last.strip()
-            if category:
-                break
+    category = _extract_category(hit)
 
     product_name = hit.get("productNameForDisp") or hit.get("name") or ""
 
@@ -184,6 +188,7 @@ def _search_keyword(keyword: str, size: int = 50) -> list[dict]:
             "sku": it.get("skuNo", ""),
             "brand_kr": brand_kr,
             "brand_en": brand_en,
+            "category": _extract_category(it),
             "product_name": it.get("productNameForDisp") or it.get("name") or "",
             "ref_no": it.get("refNo", "") or code,
             "soldout": it.get("soldOutYn") == "Y",
