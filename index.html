@@ -548,7 +548,7 @@
     keywordMeta.textContent = `"${kw}" 검색 결과 ${rows.length}개`;
     keywordBody.innerHTML = rows.map((r, i) => {
       const lnk     = r.detail_url
-        ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank">신라 ↗</a>` : '';
+        ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 열기 ↗</a>` : '';
       const soldout = r.soldout
         ? ' <span style="color:var(--red-600);font-size:0.75rem">(품절)</span>' : '';
       return `<tr>
