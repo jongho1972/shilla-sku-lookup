@@ -8,13 +8,15 @@ import asyncio
 import json
 import logging
 import re
+from io import BytesIO
 from pathlib import Path
 from typing import List
+from urllib.parse import quote
 
 from bs4 import BeautifulSoup
 from curl_cffi import requests as creq
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, Response
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -251,3 +253,75 @@ async def batch_lookup(req: BatchRequest):
 
     results = await asyncio.gather(*[fetch_one(sku) for sku in skus])
     return list(results)
+
+
+class ExportRequest(BaseModel):
+    kind: str  # "batch" | "keyword"
+    keyword: str = ""
+    rows: List[dict]
+
+
+def _xlsx_response(wb, filename: str) -> Response:
+    buf = BytesIO()
+    wb.save(buf)
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": f"attachment; filename=\"export.xlsx\"; filename*=UTF-8''{quote(filename)}"
+        },
+    )
+
+
+@app.post("/api/export")
+async def export_excel(req: ExportRequest):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font
+
+    wb = Workbook()
+    ws = wb.active
+    head_font = Font(bold=True, color="0B2E5C")
+    link_font = Font(color="1F6FEB", underline="single")
+
+    if req.kind == "keyword":
+        ws.title = "키워드검색"
+        headers = ["#", "국문 브랜드명", "영문 브랜드명", "상품유형", "상품명", "SKU.NO", "REF.NO", "상품 페이지"]
+        widths = (5, 16, 18, 12, 34, 16, 16, 12)
+    else:
+        ws.title = "SKU조회"
+        headers = ["#", "국문 브랜드명", "영문 브랜드명", "상품유형", "상품명", "SKU.NO", "REF.NO", "상품 문의", "상품 페이지"]
+        widths = (5, 16, 18, 12, 34, 16, 16, 16, 12)
+
+    ws.append(headers)
+    for c in ws[1]:
+        c.font = head_font
+
+    for i, r in enumerate(req.rows, start=1):
+        if r.get("error"):
+            ws.append([i, f"SKU {r.get('sku', '')} — 조회 실패"])
+            continue
+        if req.kind == "keyword":
+            ws.append([i, r.get("brand_kr", ""), r.get("brand_en", ""), r.get("category", ""),
+                       r.get("product_name", ""), r.get("sku", ""), r.get("ref_no", ""), ""])
+            link_col = 8
+        else:
+            ws.append([i, r.get("brand_kr", ""), r.get("brand_en", ""), r.get("category", ""),
+                       r.get("product_name", ""), r.get("sku", ""), r.get("ref_no", ""),
+                       r.get("phone", ""), ""])
+            link_col = 9
+
+        url = r.get("detail_url")
+        cell = ws.cell(row=ws.max_row, column=link_col)
+        if url:
+            cell.value = "상품 페이지"
+            cell.hyperlink = url
+            cell.font = link_font
+        else:
+            cell.value = "—"
+
+    for col, width in zip("ABCDEFGHI", widths):
+        ws.column_dimensions[col].width = width
+    ws.freeze_panes = "A2"
+
+    filename = f"키워드검색_{req.keyword}.xlsx" if req.kind == "keyword" else "SKU조회.xlsx"
+    return _xlsx_response(wb, filename)
