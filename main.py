@@ -261,6 +261,22 @@ class ExportRequest(BaseModel):
     rows: List[dict]
 
 
+def _display_width(s: str) -> float:
+    """한글 등 전각 문자는 폭 2배로 계산해 엑셀 열 너비 근사치를 구한다."""
+    import unicodedata
+    return sum(1.7 if unicodedata.east_asian_width(ch) in ("W", "F") else 1 for ch in s)
+
+
+def _autofit_columns(ws, min_width: float = 8, max_width: float = 70) -> None:
+    for col_cells in ws.columns:
+        max_len = 0.0
+        for cell in col_cells:
+            if cell.value is None:
+                continue
+            max_len = max(max_len, _display_width(str(cell.value)))
+        ws.column_dimensions[col_cells[0].column_letter].width = max(min_width, min(max_len + 2, max_width))
+
+
 def _xlsx_response(wb, filename: str) -> Response:
     buf = BytesIO()
     wb.save(buf)
@@ -286,11 +302,9 @@ async def export_excel(req: ExportRequest):
     if req.kind == "keyword":
         ws.title = "키워드검색"
         headers = ["#", "국문 브랜드명", "영문 브랜드명", "상품유형", "상품명", "SKU.NO", "REF.NO", "상품 페이지"]
-        widths = (5, 16, 18, 12, 34, 16, 16, 12)
     else:
         ws.title = "SKU조회"
         headers = ["#", "국문 브랜드명", "영문 브랜드명", "상품유형", "상품명", "SKU.NO", "REF.NO", "상품 문의", "상품 페이지"]
-        widths = (5, 16, 18, 12, 34, 16, 16, 16, 12)
 
     ws.append(headers)
     for c in ws[1]:
@@ -319,8 +333,7 @@ async def export_excel(req: ExportRequest):
         else:
             cell.value = "—"
 
-    for col, width in zip("ABCDEFGHI", widths):
-        ws.column_dimensions[col].width = width
+    _autofit_columns(ws)
     ws.freeze_panes = "A2"
 
     filename = f"키워드검색_{req.keyword}.xlsx" if req.kind == "keyword" else "SKU조회.xlsx"
