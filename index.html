@@ -4,10 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>신라면세점 SKU 조회</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🔎%3C/text%3E%3C/svg%3E" />
   <style>
     :root {
       --navy-900: #0B2E5C;
       --navy-700: #13407F;
+      --blue-500: #1F6FEB;
       --blue-050: #DCE8F6;
       --blue-025: #F4F7FB;
       --red-600:  #B42318;
@@ -30,13 +32,18 @@
       letter-spacing: -0.011em;
     }
 
-    .container { max-width: 800px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+    .container { max-width: 960px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
 
+    .eyebrow {
+      letter-spacing: 0.2em; font-weight: 700; font-size: 0.7rem;
+      color: var(--slate-400); margin: 0 0 10px; text-transform: uppercase;
+    }
     h1.page-title {
       font-weight: 800; color: var(--navy-900);
       margin: 0 0 4px; font-size: 1.875rem;
       letter-spacing: -0.025em; line-height: 1.2;
     }
+    h1.page-title span { color: var(--blue-500); }
     .page-desc {
       color: var(--slate-500); font-size: 13px;
       margin-top: 6px; letter-spacing: -0.01em; line-height: 1.5;
@@ -363,7 +370,8 @@
 <body>
 <div class="container">
 
-  <h1 class="page-title">신라면세점 SKU 조회</h1>
+  <p class="eyebrow">SHILLA · SKU LOOKUP</p>
+  <h1 class="page-title">신라면세점 <span>SKU 조회</span></h1>
   <p class="page-desc" id="pageDesc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호</p>
   <p class="site-note" id="siteNote"></p>
 
@@ -378,7 +386,7 @@
         class="sku-input"
         type="text"
         inputmode="numeric"
-        placeholder="SKU 번호 입력 (예: 096711001496)"
+        placeholder="SKU 번호 입력 (예: 046131000048)"
         autocomplete="off" spellcheck="false"
       />
       <div class="btn-group-row">
@@ -403,13 +411,13 @@
   <!-- ────────────── 다건 조회 ────────────── -->
   <div class="section-box">
     <h3>다건 조회</h3>
-    <p class="section-desc">SKU 여러 개 — 엑셀에서 복사해서 붙여넣기(최대 50개), 결과 표 엑셀 저장</p>
+    <p class="section-desc">SKU 여러 개 — 엑셀에서 복사해서 붙여넣기(최대 50개), 결과 표 엑셀 다운로드</p>
 
     <div class="input-row">
       <textarea
         id="batchInput"
         class="sku-textarea"
-        placeholder="096711001496&#10;287231000004&#10;954110000002"
+        placeholder="046131000048&#10;046331000002&#10;110231000030"
         autocomplete="off" spellcheck="false"
       ></textarea>
       <div class="btn-group-row" style="align-self:flex-end">
@@ -425,10 +433,10 @@
       <span class="batch-meta" id="batchMeta"></span>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div class="site-toggle inline" role="group" aria-label="사이트 선택 (다건 결과)">
-          <button class="site-btn active" data-site="kr" aria-pressed="true" onclick="setSite('kr')">🇰🇷 KR</button>
-          <button class="site-btn" data-site="cn" aria-pressed="false" onclick="setSite('cn')">🇨🇳 CN</button>
-          <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN</button>
-          <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP</button>
+          <button class="site-btn active" data-site="kr" aria-pressed="true" onclick="setSite('kr')">🇰🇷 KR몰</button>
+          <button class="site-btn" data-site="cn" aria-pressed="false" onclick="setSite('cn')">🇨🇳 CN몰</button>
+          <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN몰</button>
+          <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP몰</button>
         </div>
         <button class="price-btn" id="priceCompareBtn" onclick="openPriceCompare()" disabled>
           면세점별 가격비교 ↗
@@ -439,7 +447,7 @@
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
-          엑셀 저장
+          엑셀 다운로드
         </button>
       </div>
     </div>
@@ -465,7 +473,7 @@
   <!-- ────────────── 키워드 검색 ────────────── -->
   <div class="section-box" style="background:#ffffff;border-color:#B8D0E8;border-width:1.5px">
     <h3>상품명 키워드로 검색</h3>
-    <p class="section-desc">상품명 키워드 입력 → 일치하는 상품 목록 조회 (최대 50개), 결과표 엑셀 저장</p>
+    <p class="section-desc">상품명 키워드 입력 → 일치하는 상품 목록 조회 (최대 50개), 결과표 엑셀 다운로드</p>
 
     <div class="input-row">
       <input
@@ -488,10 +496,10 @@
       <span class="batch-meta" id="keywordMeta"></span>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <div class="site-toggle inline" role="group" aria-label="사이트 선택 (키워드 결과)">
-          <button class="site-btn active" data-site="kr" aria-pressed="true" onclick="setSite('kr')">🇰🇷 KR</button>
-          <button class="site-btn" data-site="cn" aria-pressed="false" onclick="setSite('cn')">🇨🇳 CN</button>
-          <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN</button>
-          <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP</button>
+          <button class="site-btn active" data-site="kr" aria-pressed="true" onclick="setSite('kr')">🇰🇷 KR몰</button>
+          <button class="site-btn" data-site="cn" aria-pressed="false" onclick="setSite('cn')">🇨🇳 CN몰</button>
+          <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN몰</button>
+          <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP몰</button>
         </div>
         <button class="price-btn" id="keywordPriceCompareBtn" onclick="openKeywordPriceCompare()" disabled>
           면세점별 가격비교 ↗
@@ -502,7 +510,7 @@
             <polyline points="7 10 12 15 17 10"/>
             <line x1="12" y1="15" x2="12" y2="3"/>
           </svg>
-          엑셀 저장
+          엑셀 다운로드
         </button>
       </div>
     </div>
@@ -680,7 +688,7 @@
     keywordResult.classList.add('show');
   }
 
-  /* ── 키워드 엑셀 저장 ── */
+  /* ── 키워드 엑셀 다운로드 ── */
   async function downloadKeywordExcel() {
     if (!currentKeywordData.length) return;
     const kw = keywordInput.value.trim();
@@ -771,7 +779,7 @@
     }
   }
 
-  /* ── 엑셀 저장 (다건 조회) ── */
+  /* ── 엑셀 다운로드 (다건 조회) ── */
   async function downloadExcel() {
     if (!currentBatchData.length) return;
     await downloadExportedExcel('batch', currentBatchData, '');
