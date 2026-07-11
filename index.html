@@ -843,7 +843,7 @@
           <td></td></tr>`;
       }
       const lnk = r.detail_url
-        ? `<a class="bt-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 열기 ↗</a>` : '';
+        ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 열기 ↗</a>` : '';
       return `<tr>
         <td class="bt-num">${i + 1}</td>
         <td>${escHtml(r.brand_kr || '—')}</td>
