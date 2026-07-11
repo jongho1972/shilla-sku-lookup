@@ -63,6 +63,9 @@
       background: #fff; color: var(--navy-900);
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
     }
+    /* 결과 툴바용 컴팩트 토글 (가격비교 버튼 왼쪽) */
+    .site-toggle.inline { margin-top: 0; padding: 2px; margin-right: 4px; }
+    .site-toggle.inline .site-btn { padding: 5px 10px; font-size: 12px; gap: 4px; }
     .site-note {
       font-size: 12px; color: var(--slate-400);
       margin-top: 8px; letter-spacing: -0.01em; min-height: 16px;
@@ -430,7 +433,13 @@
   <div class="batch-result" id="batchResult">
     <div class="batch-toolbar">
       <span class="batch-meta" id="batchMeta"></span>
-      <div style="display:flex;gap:6px;align-items:center">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <div class="site-toggle inline" role="group" aria-label="사이트 선택 (다건 결과)">
+          <button class="site-btn active" data-site="kr" aria-pressed="true" onclick="setSite('kr')">🇰🇷 KR</button>
+          <button class="site-btn" data-site="cn" aria-pressed="false" onclick="setSite('cn')">🇨🇳 CN</button>
+          <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN</button>
+          <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP</button>
+        </div>
         <button class="price-btn" id="priceCompareBtn" onclick="openPriceCompare()" disabled>
           면세점별 가격비교 ↗
         </button>
@@ -487,7 +496,13 @@
   <div class="keyword-result" id="keywordResult">
     <div class="batch-toolbar">
       <span class="batch-meta" id="keywordMeta"></span>
-      <div style="display:flex;gap:6px;align-items:center">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <div class="site-toggle inline" role="group" aria-label="사이트 선택 (키워드 결과)">
+          <button class="site-btn active" data-site="kr" aria-pressed="true" onclick="setSite('kr')">🇰🇷 KR</button>
+          <button class="site-btn" data-site="cn" aria-pressed="false" onclick="setSite('cn')">🇨🇳 CN</button>
+          <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN</button>
+          <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP</button>
+        </div>
         <button class="price-btn" id="keywordPriceCompareBtn" onclick="openKeywordPriceCompare()" disabled>
           면세점별 가격비교 ↗
         </button>
