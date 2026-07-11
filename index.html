@@ -67,8 +67,6 @@
       font-size: 12px; color: var(--slate-400);
       margin-top: 8px; letter-spacing: -0.01em; min-height: 16px;
     }
-    /* 외국몰 모드에서는 상품 문의 컬럼 숨김 (국문몰만 제공) */
-    body.site-foreign .bt-phone-col { display: none; }
 
     /* ── 섹션 박스 ── */
     .section-box {
@@ -439,7 +437,6 @@
             <th>상품명</th>
             <th>SKU.NO</th>
             <th>REF.NO</th>
-            <th class="bt-phone-col">상품 문의</th>
             <th></th>
           </tr>
         </thead>
@@ -839,7 +836,6 @@
         return `<tr class="bt-error">
           <td class="bt-num">${i + 1}</td>
           <td colspan="6" style="color:var(--slate-400);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
-          <td class="bt-phone-col"></td>
           <td></td></tr>`;
       }
       const lnk = r.detail_url
@@ -852,7 +848,6 @@
         <td class="bt-name">${escHtml(r.product_name || '—')}</td>
         <td class="bt-sku">${escHtml(r.sku || '—')}</td>
         <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
-        <td class="bt-phone-col">${escHtml(r.phone || '—')}</td>
         <td>${lnk}</td></tr>`;
     }).join('');
     batchResult.classList.add('show');

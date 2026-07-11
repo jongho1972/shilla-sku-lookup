@@ -399,16 +399,9 @@ async def export_excel(req: ExportRequest):
     head_font = Font(bold=True, color="0B2E5C")
     link_font = Font(color="1F6FEB", underline="single")
 
-    foreign = req.site != "kr"
-    brand_col = "브랜드명" if foreign else "국문 브랜드명"
-    with_phone = req.kind != "keyword" and not foreign  # 외국몰은 상품 문의 미제공
-    if req.kind == "keyword":
-        ws.title = "키워드검색"
-        headers = ["#", brand_col, "영문 브랜드명", "상품유형", "상품명", "SKU.NO", "REF.NO", "상품 페이지"]
-    else:
-        ws.title = "SKU조회"
-        headers = ["#", brand_col, "영문 브랜드명", "상품유형", "상품명", "SKU.NO", "REF.NO"] \
-            + (["상품 문의"] if with_phone else []) + ["상품 페이지"]
+    brand_col = "브랜드명" if req.site != "kr" else "국문 브랜드명"
+    ws.title = "키워드검색" if req.kind == "keyword" else "SKU조회"
+    headers = ["#", brand_col, "영문 브랜드명", "상품유형", "상품명", "SKU.NO", "REF.NO", "상품 페이지"]
 
     ws.append(headers)
     for c in ws[1]:
@@ -418,13 +411,8 @@ async def export_excel(req: ExportRequest):
         if r.get("error"):
             ws.append([i, f"SKU {r.get('sku', '')} — 조회 실패"])
             continue
-        if req.kind == "keyword":
-            ws.append([i, r.get("brand_kr", ""), r.get("brand_en", ""), r.get("category", ""),
-                       r.get("product_name", ""), r.get("sku", ""), r.get("ref_no", ""), ""])
-        else:
-            ws.append([i, r.get("brand_kr", ""), r.get("brand_en", ""), r.get("category", ""),
-                       r.get("product_name", ""), r.get("sku", ""), r.get("ref_no", "")]
-                      + ([r.get("phone", "")] if with_phone else []) + [""])
+        ws.append([i, r.get("brand_kr", ""), r.get("brand_en", ""), r.get("category", ""),
+                   r.get("product_name", ""), r.get("sku", ""), r.get("ref_no", ""), ""])
         link_col = len(headers)
 
         url = r.get("detail_url")
