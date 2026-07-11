@@ -42,6 +42,34 @@
       margin-top: 6px; letter-spacing: -0.01em; line-height: 1.5;
     }
 
+    /* ── 사이트 선택 (KR/CN/EN/JP) ── */
+    .site-toggle {
+      display: inline-flex; margin-top: 14px;
+      background: var(--slate-050);
+      border: 1px solid var(--slate-100);
+      border-radius: 8px; padding: 3px; gap: 2px;
+    }
+    .site-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 16px; border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+      background: transparent; color: var(--slate-500);
+      border: none; cursor: pointer;
+      font-family: inherit; letter-spacing: -0.01em; white-space: nowrap;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .site-btn:hover { color: var(--slate-700); }
+    .site-btn.active {
+      background: #fff; color: var(--navy-900);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+    }
+    .site-note {
+      font-size: 12px; color: var(--slate-400);
+      margin-top: 8px; letter-spacing: -0.01em; min-height: 16px;
+    }
+    /* 외국몰 모드에서는 상품 문의 컬럼 숨김 (국문몰만 제공) */
+    body.site-foreign .bt-phone-col { display: none; }
+
     /* ── 섹션 박스 ── */
     .section-box {
       background: var(--slate-050);
@@ -320,7 +348,15 @@
 <div class="container">
 
   <h1 class="page-title">신라면세점 SKU 조회</h1>
-  <p class="page-desc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호</p>
+  <p class="page-desc" id="pageDesc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호</p>
+
+  <div class="site-toggle" role="group" aria-label="사이트 선택">
+    <button class="site-btn active" data-site="kr" aria-pressed="true" onclick="setSite('kr')">🇰🇷 KR몰</button>
+    <button class="site-btn" data-site="cn" aria-pressed="false" onclick="setSite('cn')">🇨🇳 CN몰</button>
+    <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN몰</button>
+    <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP몰</button>
+  </div>
+  <p class="site-note" id="siteNote"></p>
 
   <!-- ────────────── 단건 조회 ────────────── -->
   <div class="section-box">
@@ -397,13 +433,13 @@
         <thead>
           <tr>
             <th class="bt-num">#</th>
-            <th>국문 브랜드명</th>
+            <th id="batchThBrandKr">국문 브랜드명</th>
             <th>영문 브랜드명</th>
             <th>상품유형</th>
             <th>상품명</th>
             <th>SKU.NO</th>
             <th>REF.NO</th>
-            <th>상품 문의</th>
+            <th class="bt-phone-col">상품 문의</th>
             <th></th>
           </tr>
         </thead>
@@ -455,7 +491,7 @@
         <thead>
           <tr>
             <th class="bt-num">#</th>
-            <th>국문 브랜드명</th>
+            <th id="keywordThBrandKr">국문 브랜드명</th>
             <th>영문 브랜드명</th>
             <th>상품유형</th>
             <th>상품명</th>
@@ -503,25 +539,58 @@
 
   let currentBatchData  = [];
   let currentSingleData = {};
+  let currentSite = 'kr';   // 'kr' | 'cn' | 'en' | 'jp'
 
   singleInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSingle(); });
   keywordInput.addEventListener('keydown', e => { if (e.key === 'Enter') doKeyword(); });
+
+  /* ── 사이트 선택 (KR/CN/EN/JP) ── */
+  const SITE_INFO = {
+    cn: { mall: '중문몰(shilladutyfree.cn)', lang: '중문' },
+    en: { mall: '영문몰(shilladfs.com/en)',  lang: '영문' },
+    jp: { mall: '일문몰(shilladfs.com/ja)',  lang: '일문' },
+  };
+
+  function setSite(site) {
+    if (site === currentSite) return;
+    currentSite = site;
+    const foreign = site !== 'kr';
+    document.body.classList.toggle('site-foreign', foreign);
+    document.querySelectorAll('.site-btn').forEach(b => {
+      const active = b.dataset.site === site;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-pressed', active);
+    });
+    const info = SITE_INFO[site];
+    document.getElementById('pageDesc').textContent = foreign
+      ? `SKU 번호 입력 → 브랜드명 · ${info.lang} 상품명 · REF.NO`
+      : 'SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호';
+    document.getElementById('siteNote').textContent = foreign
+      ? `${info.mall} 결과 표시 — 입력은 국문몰과 동일하게 하시면 됩니다. 상품명은 ${info.lang}으로 표시되며, 상품 문의 전화번호·가격비교는 지원되지 않습니다`
+      : '';
+    document.getElementById('batchThBrandKr').textContent   = foreign ? '브랜드명' : '국문 브랜드명';
+    document.getElementById('keywordThBrandKr').textContent = foreign ? '브랜드명' : '국문 브랜드명';
+    /* 사이트 간 결과 혼동 방지를 위해 기존 결과 초기화 */
+    resetSingle(false);
+    resetBatch(false);
+    resetKeyword(false);
+  }
 
   /* 초기 빈 카드 표시 */
   renderSingleResult({});
 
   /* ── 단건 초기화 ── */
-  function resetSingle() {
+  function resetSingle(focus = true) {
     singleInput.value = '';
-    singleInput.focus();
+    if (focus) singleInput.focus();
     showStatus(singleStatus, '');
     renderSingleResult({});
   }
 
   /* ── 키워드 초기화 ── */
-  function resetKeyword() {
+  function resetKeyword(focus = true) {
     keywordInput.value = '';
-    keywordInput.focus();
+    if (focus) keywordInput.focus();
     showStatus(keywordStatus, '');
     keywordResult.classList.remove('show');
     currentKeywordData = [];
@@ -536,13 +605,13 @@
     keywordResult.classList.remove('show');
     showStatus(keywordStatus, '<span class="spinner"></span><span>검색 중…</span>');
     try {
-      const res  = await fetch(`/api/search?keyword=${encodeURIComponent(kw)}`);
+      const res  = await fetch(`/api/search?keyword=${encodeURIComponent(kw)}&site=${currentSite}`);
       const data = await res.json();
       if (!res.ok) { showStatus(keywordStatus, data.detail || '검색 실패', 'error'); return; }
       if (!data.length) { showStatus(keywordStatus, '검색 결과가 없습니다'); return; }
       currentKeywordData = data;
       renderKeywordTable(data, kw);
-      keywordPriceCompareBtn.disabled = data.filter(r => r.sku).length === 0;
+      keywordPriceCompareBtn.disabled = currentSite !== 'kr' || data.filter(r => r.sku).length === 0;
       showStatus(keywordStatus, '');
     } catch {
       showStatus(keywordStatus, '서버에 연결할 수 없습니다', 'error');
@@ -582,9 +651,9 @@
   }
 
   /* ── 다건 초기화 ── */
-  function resetBatch() {
+  function resetBatch(focus = true) {
     batchInput.value = '';
-    batchInput.focus();
+    if (focus) batchInput.focus();
     showStatus(batchStatus, '');
     batchResult.classList.remove('show');
     currentBatchData = [];
@@ -612,7 +681,7 @@
     card.classList.remove('show');
     showStatus(singleStatus, '<span class="spinner"></span><span>조회 중…</span>');
     try {
-      const res  = await fetch(`/api/lookup?sku=${encodeURIComponent(sku)}`);
+      const res  = await fetch(`/api/lookup?sku=${encodeURIComponent(sku)}&site=${currentSite}`);
       const data = await res.json();
       if (!res.ok) { showStatus(singleStatus, data.detail || '조회 실패', 'error'); return; }
       renderSingleResult(data);
@@ -639,13 +708,13 @@
       const res  = await fetch('/api/batch', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({skus}),
+        body: JSON.stringify({skus, site: currentSite}),
       });
       const data = await res.json();
       if (!res.ok) { showStatus(batchStatus, data.detail || '조회 실패', 'error'); return; }
       currentBatchData = data;
       renderBatchTable(data);
-      priceCompareBtn.disabled = data.filter(r => !r.error).length === 0;
+      priceCompareBtn.disabled = currentSite !== 'kr' || data.filter(r => !r.error).length === 0;
       showStatus(batchStatus, '');
     } catch {
       showStatus(batchStatus, '서버에 연결할 수 없습니다', 'error');
@@ -666,7 +735,7 @@
       const res = await fetch('/api/export', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({kind, keyword, rows}),
+        body: JSON.stringify({kind, keyword, rows, site: currentSite}),
       });
       if (!res.ok) { alert('엑셀 생성에 실패했습니다'); return; }
       const blob = await res.blob();
@@ -688,15 +757,16 @@
   const CHECK_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
 
   function renderSingleResult(d) {
+    const foreign = currentSite !== 'kr';
     const rows = [
-      ['국문 브랜드명', d.brand_kr    || '—', ''],
+      [foreign ? '브랜드명' : '국문 브랜드명', d.brand_kr || '—', ''],
       ['영문 브랜드명', d.brand_en    || '—', 'td-brand-en'],
       ['상품유형',      d.category    || '—', ''],
       ['상품명',        d.product_name|| '—', ''],
       ['SKU.NO',        d.sku         || '—', ''],
       ['REF.NO',        d.ref_no      || '—', 'td-ref'],
-      ['상품 문의',     d.phone       || '—', 'td-phone'],
     ];
+    if (!foreign) rows.push(['상품 문의', d.phone || '—', 'td-phone']);
     tbl.innerHTML = rows.map(([label, value, cls]) => {
       const copyBtn = value !== '—'
         ? `<button class="btn-copy" title="복사" onclick="copyVal(this,'${escAttr(value)}')">${COPY_ICON}</button>`
@@ -746,7 +816,8 @@
       if (r.error) {
         return `<tr class="bt-error">
           <td class="bt-num">${i + 1}</td>
-          <td colspan="7" style="color:var(--slate-400);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
+          <td colspan="6" style="color:var(--slate-400);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
+          <td class="bt-phone-col"></td>
           <td></td></tr>`;
       }
       const lnk = r.detail_url
@@ -759,7 +830,7 @@
         <td class="bt-name">${escHtml(r.product_name || '—')}</td>
         <td class="bt-sku">${escHtml(r.sku || '—')}</td>
         <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
-        <td>${escHtml(r.phone || '—')}</td>
+        <td class="bt-phone-col">${escHtml(r.phone || '—')}</td>
         <td>${lnk}</td></tr>`;
     }).join('');
     batchResult.classList.add('show');
