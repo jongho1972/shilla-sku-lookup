@@ -98,45 +98,16 @@ def _extract_category(hit: dict) -> str:
     return ""
 
 
-def _fetch_product(sku: str, site: str = "kr") -> dict:
-    conf = SITE_CONF[site]
-    sess = _make_session(conf)
-
-    # 1. 검색 페이지에서 CSRF 토큰 획득
-    token = _get_csrf(sess, conf, sku)
-
-    # 2. SKU로 상품 검색
-    body = {
-        "json": json.dumps({
-            "category": "", "size": "10", "page": 0,
-            "text": sku, "within": "", "query": sku,
-            "pagination": "", "condition": {"discountRate": "0"},
-        }, ensure_ascii=False),
-        "CSRFToken": token,
-    }
-    r = sess.post(conf["ajax"], data=body,
-                  headers={"X-Requested-With": "XMLHttpRequest"}, timeout=15)
-    r.raise_for_status()
-    results = r.json().get("results", [])
-
-    if not results:
-        return {}
-
-    # skuNo 필드로 정확 매칭, 없으면 미조회 처리
-    hit = next((it for it in results if it.get("skuNo") == sku), None)
-    if not hit:
-        return {}
-
+def _enrich_hit(hit: dict, sku: str, sess, conf: dict) -> dict:
+    """검색 결과 1건(hit)을 상세 페이지 파싱까지 보강해 상품 dict로 변환."""
     code = hit.get("code", "")
     brand_cat = hit.get("brandCategory") or {}
     brand_kr = (hit.get("brandName") or brand_cat.get("brandName") or "").strip()
     brand_en = (brand_cat.get("enName") or hit.get("brandEnName") or "").strip()
-
     category = _extract_category(hit)
-
     product_name = hit.get("productNameForDisp") or hit.get("name") or ""
 
-    # 3. 상세 페이지에서 영문 브랜드명, 전화번호 파싱 (REF.NO는 API 응답에서 직접 사용)
+    # 상세 페이지에서 영문 브랜드명, 전화번호 파싱 (REF.NO는 API 응답에서 직접 사용)
     #    - strong.info_brand: "한글명 | 영문명"
     #    - strong.number_title → 부모 li 텍스트: 상품 문의
     ref_no = hit.get("refNo", "") or code
@@ -185,6 +156,37 @@ def _fetch_product(sku: str, site: str = "kr") -> dict:
         "phone": phone,
         "detail_url": conf["detail_pc"].format(code=code) if code else "",
     }
+
+
+def _fetch_products(sku: str, site: str = "kr") -> list[dict]:
+    """SKU로 조회해 **skuNo가 일치하는 모든 상품**을 반환.
+
+    같은 SKU에 단품·[2개이상구매] 등 별개 상품이 여러 개 걸릴 수 있어(가격·상품코드
+    상이) 전부 돌려준다(신라 사이트 검색 결과와 개수 일치).
+    """
+    conf = SITE_CONF[site]
+    sess = _make_session(conf)
+    token = _get_csrf(sess, conf, sku)
+    body = {
+        "json": json.dumps({
+            "category": "", "size": "10", "page": 0,
+            "text": sku, "within": "", "query": sku,
+            "pagination": "", "condition": {"discountRate": "0"},
+        }, ensure_ascii=False),
+        "CSRFToken": token,
+    }
+    r = sess.post(conf["ajax"], data=body,
+                  headers={"X-Requested-With": "XMLHttpRequest"}, timeout=15)
+    r.raise_for_status()
+    results = r.json().get("results", [])
+    hits = [it for it in results if it.get("skuNo") == sku]
+    return [_enrich_hit(h, sku, sess, conf) for h in hits]
+
+
+def _fetch_product(sku: str, site: str = "kr") -> dict:
+    """단건 조회용 — 대표 상품 1건(첫 매칭)만 반환. 다건은 _fetch_products 사용."""
+    products = _fetch_products(sku, site)
+    return products[0] if products else {}
 
 
 @app.get("/shilla_logo.png")
@@ -342,14 +344,16 @@ async def batch_lookup(req: BatchRequest):
     async def fetch_one(sku: str):
         async with sem:
             try:
-                result = await loop.run_in_executor(None, _fetch_product, sku, req.site)
-                return result if result else {"sku": sku, "error": True}
+                # 같은 SKU에 상품이 여러 개면 전부 반환(신라 검색 결과와 개수 일치)
+                products = await loop.run_in_executor(None, _fetch_products, sku, req.site)
+                return products if products else [{"sku": sku, "error": True}]
             except Exception as e:
                 logger.warning("배치 조회 실패 sku=%s: %s", sku, e)
-                return {"sku": sku, "error": True}
+                return [{"sku": sku, "error": True}]
 
     results = await asyncio.gather(*[fetch_one(sku) for sku in skus])
-    return list(results)
+    # 입력 SKU 순서 유지하며 상품 단위로 평탄화
+    return [item for sublist in results for item in sublist]
 
 
 class ExportRequest(BaseModel):

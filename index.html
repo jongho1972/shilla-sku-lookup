@@ -714,13 +714,14 @@
   }
 
   function openPriceCompare() {
-    const skus = currentBatchData.filter(r => !r.error).map(r => r.sku);
+    // 같은 SKU가 여러 상품 행으로 반복될 수 있어 중복 제거 후 전달
+    const skus = [...new Set(currentBatchData.filter(r => !r.error).map(r => r.sku).filter(Boolean))];
     if (!skus.length) return;
     window.open(priceCompareUrl(skus), 'dfpriceCompare');
   }
 
   function openKeywordPriceCompare() {
-    const skus = currentKeywordData.filter(r => r.sku).map(r => r.sku);
+    const skus = [...new Set(currentKeywordData.filter(r => r.sku).map(r => r.sku).filter(Boolean))];
     if (!skus.length) return;
     window.open(priceCompareUrl(skus), 'dfpriceCompare');
   }
@@ -867,7 +868,12 @@
   function renderBatchTable(rows) {
     const ok   = rows.filter(r => !r.error).length;
     const fail = rows.filter(r =>  r.error).length;
-    batchMeta.textContent = `총 ${rows.length}개 조회 — 성공 ${ok}개` + (fail ? ` / 조회 실패 ${fail}개` : '');
+    const skuCount = new Set(rows.map(r => r.sku)).size;
+    // 한 SKU가 여러 상품(단품·2개이상구매 등)으로 잡히면 SKU 수와 상품 수를 구분 표기
+    batchMeta.textContent = (skuCount === rows.length
+        ? `총 ${rows.length}개 조회 — 성공 ${ok}개`
+        : `SKU ${skuCount}개 · 상품 ${ok}개`)
+      + (fail ? ` / 조회 실패 ${fail}개` : '');
     batchBody.innerHTML = rows.map((r, i) => {
       if (r.error) {
         return `<tr class="bt-error">
