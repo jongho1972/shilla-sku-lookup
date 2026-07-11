@@ -582,7 +582,7 @@
       ? `SKU 번호 입력 → 브랜드명 · ${info.lang} 상품명 · REF.NO`
       : 'SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호';
     document.getElementById('siteNote').textContent = foreign
-      ? `${info.mall} 결과 표시 — 입력은 국문몰과 동일하게 하시면 됩니다. 상품명은 ${info.lang}으로 표시되며, 상품 문의 전화번호·가격비교는 지원되지 않습니다`
+      ? `${info.mall} 결과 표시 — 입력은 국문몰과 동일하게 하시면 됩니다. 상품명은 ${info.lang}으로 표시되며, 상품 문의 전화번호는 지원되지 않습니다`
       : '';
     document.getElementById('batchThBrandKr').textContent   = foreign ? '브랜드명' : '국문 브랜드명';
     document.getElementById('keywordThBrandKr').textContent = foreign ? '브랜드명' : '국문 브랜드명';
@@ -644,7 +644,7 @@
       currentKeywordData = data;
       lastKeyword = kw;
       renderKeywordTable(data, kw);
-      keywordPriceCompareBtn.disabled = site !== 'kr' || data.filter(r => r.sku).length === 0;
+      keywordPriceCompareBtn.disabled = data.filter(r => r.sku).length === 0;
       showStatus(keywordStatus, '');
     } catch {
       showStatus(keywordStatus, '서버에 연결할 수 없습니다', 'error');
@@ -693,17 +693,23 @@
     priceCompareBtn.disabled = true;
   }
 
-  /* ── 면세점별 가격비교 열기 ── */
+  /* ── 면세점별 가격비교 열기 (선택한 몰을 가격비교 사이트 디폴트로 전달) ── */
+  function priceCompareUrl(skus) {
+    const params = new URLSearchParams({ skus: skus.join(',') });
+    if (currentSite !== 'kr') params.set('mall', currentSite);
+    return 'https://dfprice.jhawk.kr/?' + params.toString();
+  }
+
   function openPriceCompare() {
     const skus = currentBatchData.filter(r => !r.error).map(r => r.sku);
     if (!skus.length) return;
-    window.open('https://dfprice.jhawk.kr/?skus=' + skus.join(','), 'dfpriceCompare');
+    window.open(priceCompareUrl(skus), 'dfpriceCompare');
   }
 
   function openKeywordPriceCompare() {
     const skus = currentKeywordData.filter(r => r.sku).map(r => r.sku);
     if (!skus.length) return;
-    window.open('https://dfprice.jhawk.kr/?skus=' + skus.join(','), 'dfpriceCompare');
+    window.open(priceCompareUrl(skus), 'dfpriceCompare');
   }
 
   /* ── 단건 조회 ── */
@@ -751,7 +757,7 @@
       if (!res.ok) { showStatus(batchStatus, data.detail || '조회 실패', 'error'); return; }
       currentBatchData = data;
       renderBatchTable(data);
-      priceCompareBtn.disabled = site !== 'kr' || data.filter(r => !r.error).length === 0;
+      priceCompareBtn.disabled = data.filter(r => !r.error).length === 0;
       showStatus(batchStatus, '');
     } catch {
       showStatus(batchStatus, '서버에 연결할 수 없습니다', 'error');
