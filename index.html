@@ -275,7 +275,17 @@
     .batch-table {
       width: 100%; min-width: 1100px;
       border-collapse: collapse; font-size: 0.95rem;
+      table-layout: fixed;   /* 다건·키워드 표 열 너비 통일 (내용과 무관하게 고정) */
     }
+    .batch-table th:nth-child(1) { width: 48px; }
+    .batch-table th:nth-child(2) { width: 128px; }  /* 국문 브랜드명 */
+    .batch-table th:nth-child(3) { width: 150px; }  /* 영문 브랜드명 */
+    .batch-table th:nth-child(4) { width: 100px; }  /* 상품유형 */
+    /* 5번째(상품명)는 남는 폭 전부 사용 */
+    .batch-table th:nth-child(6) { width: 132px; }  /* SKU.NO */
+    .batch-table th:nth-child(7) { width: 118px; }  /* REF.NO */
+    .batch-table th:nth-child(8) { width: 158px; }  /* 상품 페이지 */
+    .batch-table td { overflow-wrap: break-word; }
     .batch-table thead th:last-child { background: var(--blue-025); }
     .batch-table thead th {
       padding: 12px 16px; text-align: left; white-space: nowrap;
@@ -290,8 +300,8 @@
     .bt-sku   { font-family: ui-monospace,"SF Mono","Fira Code",monospace; font-size: 0.88rem;
                 font-weight: 700; color: var(--navy-900); letter-spacing: 0.03em; white-space: nowrap; }
     .bt-brand-en { font-weight: 700; letter-spacing: 0.04em; }
-    .bt-cat   { min-width: 90px; white-space: nowrap; }
-    .bt-name  { font-weight: 600; color: var(--navy-900); min-width: 200px; }
+    .bt-cat   { }
+    .bt-name  { font-weight: 600; color: var(--navy-900); }
     .bt-ref   { font-family: ui-monospace,"SF Mono","Fira Code",monospace; font-size: 0.85rem;
                 color: var(--slate-700); white-space: nowrap; }
     .bt-error td { color: var(--slate-400) !important; }
@@ -328,7 +338,15 @@
     .batch-scroll::-webkit-scrollbar-track { background: transparent; }
 
     @media (max-width: 800px) {
-      .batch-table { min-width: 800px; }
+      /* 좁은 화면: 고정 열 축소(합 700px) + 상품명 최소 220px 확보 */
+      .batch-table { min-width: 920px; }
+      .batch-table th:nth-child(1) { width: 40px; }
+      .batch-table th:nth-child(2) { width: 104px; }
+      .batch-table th:nth-child(3) { width: 120px; }
+      .batch-table th:nth-child(4) { width: 84px; }
+      .batch-table th:nth-child(6) { width: 112px; }
+      .batch-table th:nth-child(7) { width: 100px; }
+      .batch-table th:nth-child(8) { width: 140px; }
     }
     @media (max-width: 560px) {
       .container { padding: 1.75rem 1rem 3rem; }
@@ -336,7 +354,7 @@
       .input-row { flex-direction: column; }
       .btn-group { flex-direction: row; }
       .search-btn, .reset-btn { flex: 1; justify-content: center; }
-      .batch-table { min-width: 700px; font-size: 0.82rem; }
+      .batch-table { min-width: 880px; font-size: 0.82rem; }
       .batch-table thead th, .batch-table td { padding: 9px 10px; }
       .batch-toolbar { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
