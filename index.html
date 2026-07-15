@@ -630,8 +630,8 @@
   /* ── 정렬 상태 (열 헤더 클릭) ──
      key=null 이면 원본(입력/검색) 순서. dir: 1=오름차순, -1=내림차순 */
   const NUMERIC_SORT_KEYS = new Set(['sku', 'ref_no']);
-  let batchSort   = { key: null,           dir: 1 };
-  let keywordSort = { key: 'product_name', dir: 1 };   // 키워드 결과 기본: 상품명 오름차순
+  let batchSort   = { key: 'sku', dir: 1 };   // 다건 결과 기본: SKU 오름차순
+  let keywordSort = { key: 'sku', dir: 1 };   // 키워드 결과 기본: SKU 오름차순
 
   /* 정렬 비교기 — 에러 행은 항상 맨 아래, 숫자형 키는 수치 비교 */
   function sortRows(rows, sort) {
