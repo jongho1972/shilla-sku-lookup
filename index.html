@@ -262,6 +262,8 @@
       transition: background 0.15s, border-color 0.15s;
     }
     .csv-btn:hover { background: var(--blue-025); border-color: var(--navy-700); }
+    .csv-btn:disabled { opacity: 0.4; cursor: default; background: #fff; border-color: var(--slate-200); }
+    .csv-btn.copied { border-color: var(--green-700); color: var(--green-700); background: #F0FDF4; }
 
     .price-btn {
       display: inline-flex; align-items: center; gap: 5px;
@@ -307,6 +309,26 @@
     .batch-table td { padding: 14px 16px; vertical-align: middle; color: #111827; font-weight: 500; }
 
     .bt-num   { color: var(--slate-400); font-size: 0.8rem; font-weight: 700; width: 36px; text-align: center; }
+
+    /* ── 키워드 결과: 선택 체크박스 열 ── */
+    .keyword-result .batch-table th:nth-child(1),
+    .keyword-result .batch-table td:nth-child(1) { width: 60px; }
+    .check-cell {
+      display: inline-flex; align-items: center; gap: 8px;
+      cursor: pointer; user-select: none;
+    }
+    .check-cell .bt-num-inline { color: var(--slate-400); font-size: 0.8rem; font-weight: 700; }
+    input.row-check, input.select-all {
+      width: 15px; height: 15px; margin: 0; cursor: pointer;
+      accent-color: var(--navy-900); flex-shrink: 0; vertical-align: middle;
+    }
+    .keyword-result .batch-table tbody tr.row-selected td { background: var(--blue-025); }
+
+    .sel-count {
+      font-size: 12px; font-weight: 700; color: var(--navy-900);
+      letter-spacing: -0.01em; white-space: nowrap;
+      padding: 0 4px;
+    }
     .bt-sku   { font-family: ui-monospace,"SF Mono","Fira Code",monospace; font-size: 0.88rem;
                 font-weight: 700; color: var(--navy-900); letter-spacing: 0.03em; white-space: nowrap; }
     .bt-brand-en { font-weight: 700; letter-spacing: 0.04em; }
@@ -511,6 +533,11 @@
           <button class="site-btn" data-site="en" aria-pressed="false" onclick="setSite('en')">🇺🇸 EN몰</button>
           <button class="site-btn" data-site="jp" aria-pressed="false" onclick="setSite('jp')">🇯🇵 JP몰</button>
         </div>
+        <span class="sel-count" id="keywordSelCount" style="display:none"></span>
+        <button class="csv-btn" id="keywordCopySkuBtn" onclick="copySelectedKeywordSku()" disabled>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          선택 SKU 복사
+        </button>
         <button class="price-btn" id="keywordPriceCompareBtn" onclick="openKeywordPriceCompare()" disabled>
           면세점별 가격비교 ↗
         </button>
@@ -528,7 +555,7 @@
       <table class="batch-table">
         <thead>
           <tr>
-            <th class="bt-num">#</th>
+            <th class="bt-num"><input type="checkbox" class="select-all" id="keywordSelectAll" title="전체 선택" aria-label="전체 선택" /></th>
             <th id="keywordThBrandKr" class="sortable" data-sort="brand_kr">국문 브랜드명<span class="sort-ind">↕</span></th>
             <th class="sortable" data-sort="brand_en">영문 브랜드명<span class="sort-ind">↕</span></th>
             <th class="sortable" data-sort="category">상품유형<span class="sort-ind">↕</span></th>
@@ -564,7 +591,19 @@
   const keywordBody   = document.getElementById('keywordBody');
   const keywordMeta   = document.getElementById('keywordMeta');
   const keywordPriceCompareBtn = document.getElementById('keywordPriceCompareBtn');
+  const keywordSelectAll       = document.getElementById('keywordSelectAll');
+  const keywordCopySkuBtn      = document.getElementById('keywordCopySkuBtn');
+  const keywordSelCount        = document.getElementById('keywordSelCount');
   let currentKeywordData = [];
+  /* 선택된 행 식별자 집합 — 정렬 시에도 유지.
+     같은 SKU가 여러 상품 행(단품·2개이상구매 등)으로 잡히므로 상품명까지 포함해 행별로 고유화 */
+  const keywordSelected = new Set();
+  const keywordRowKey = r => `${r.sku || ''}|${r.ref_no || ''}|${r.product_name || ''}`;
+  /* 선택이 있으면 선택 행만, 없으면 전체를 반환 */
+  function selectedKeywordRows() {
+    if (!keywordSelected.size) return currentKeywordData;
+    return currentKeywordData.filter(r => keywordSelected.has(keywordRowKey(r)));
+  }
 
   const batchInput       = document.getElementById('batchInput');
   const batchBtn         = document.getElementById('batchBtn');
@@ -739,6 +778,55 @@
   wireSortHeaders(batchBody, () => batchSort,
     () => { if (currentBatchData.length) renderBatchTable(currentBatchData); });
 
+  /* ── 키워드 결과 선택(체크박스) ── */
+  // 개별 행 체크 (이벤트 위임 — tbody는 렌더마다 교체되므로)
+  keywordBody.addEventListener('change', e => {
+    const cb = e.target.closest('.row-check');
+    if (!cb) return;
+    const key = cb.dataset.key;
+    if (cb.checked) keywordSelected.add(key); else keywordSelected.delete(key);
+    cb.closest('tr')?.classList.toggle('row-selected', cb.checked);
+    updateKeywordSelectionUI();
+  });
+  // 전체 선택 (thead는 고정이라 1회 연결)
+  keywordSelectAll.addEventListener('change', e => {
+    const checked = e.target.checked;
+    keywordBody.querySelectorAll('.row-check').forEach(cb => {
+      cb.checked = checked;
+      if (checked) keywordSelected.add(cb.dataset.key); else keywordSelected.delete(cb.dataset.key);
+      cb.closest('tr')?.classList.toggle('row-selected', checked);
+    });
+    updateKeywordSelectionUI();
+  });
+
+  /* 선택 상태에 따라 전체선택 체크박스·카운트·버튼 갱신 */
+  function updateKeywordSelectionUI() {
+    const total = keywordBody.querySelectorAll('.row-check').length;
+    const sel   = keywordBody.querySelectorAll('.row-check:checked').length;
+    keywordSelectAll.checked = total > 0 && sel === total;
+    keywordSelectAll.indeterminate = sel > 0 && sel < total;
+    if (sel > 0) {
+      keywordSelCount.textContent = `${sel}개 선택 · 복사·가격비교·엑셀에 반영`;
+      keywordSelCount.style.display = '';
+    } else {
+      keywordSelCount.style.display = 'none';
+    }
+    keywordCopySkuBtn.disabled = sel === 0;
+  }
+
+  /* ── 선택 SKU 복사 (줄바꿈 구분, 중복 제거) ── */
+  function copySelectedKeywordSku() {
+    const rows = currentKeywordData.filter(r => keywordSelected.has(keywordRowKey(r)));
+    const skus = [...new Set(rows.map(r => r.sku).filter(Boolean))];
+    if (!skus.length) return;
+    navigator.clipboard.writeText(skus.join('\n')).then(() => {
+      const orig = keywordCopySkuBtn.innerHTML;
+      keywordCopySkuBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${skus.length}개 복사됨!`;
+      keywordCopySkuBtn.classList.add('copied');
+      setTimeout(() => { keywordCopySkuBtn.innerHTML = orig; keywordCopySkuBtn.classList.remove('copied'); }, 1500);
+    });
+  }
+
   /* 초기 빈 카드 표시 */
   renderSingleResult({});
 
@@ -759,8 +847,12 @@
     showStatus(keywordStatus, '');
     keywordResult.classList.remove('show');
     currentKeywordData = [];
+    keywordSelected.clear();
     lastKeyword = '';
     keywordPriceCompareBtn.disabled = true;
+    keywordCopySkuBtn.disabled = true;
+    keywordSelCount.style.display = 'none';
+    keywordSelectAll.checked = keywordSelectAll.indeterminate = false;
     siteCache.keyword = {};
   }
 
@@ -779,6 +871,7 @@
       if (!res.ok) { showStatus(keywordStatus, data.detail || '검색 실패', 'error'); return; }
       if (!data.length) { showStatus(keywordStatus, '검색 결과가 없습니다'); return; }
       currentKeywordData = data;
+      keywordSelected.clear();   // 새 검색 결과 → 선택 초기화
       lastKeyword = kw;
       renderKeywordTable(data, kw);
       keywordPriceCompareBtn.disabled = data.filter(r => r.sku).length === 0;
@@ -800,8 +893,12 @@
         ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 열기 ↗</a>` : '';
       const soldout = r.soldout
         ? ' <span style="color:var(--red-600);font-size:0.75rem">(품절)</span>' : '';
-      return `<tr>
-        <td class="bt-num">${i + 1}</td>
+      const key     = keywordRowKey(r);
+      const checked = keywordSelected.has(key);
+      return `<tr${checked ? ' class="row-selected"' : ''}>
+        <td class="bt-num"><label class="check-cell">
+          <input type="checkbox" class="row-check" data-key="${escAttr(key)}"${checked ? ' checked' : ''} aria-label="행 선택" />
+          <span class="bt-num-inline">${i + 1}</span></label></td>
         <td>${escHtml(r.brand_kr || '—')}</td>
         <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
         <td class="bt-cat">${escHtml(r.category || '—')}</td>
@@ -811,13 +908,15 @@
         <td>${lnk}</td></tr>`;
     }).join('');
     keywordResult.classList.add('show');
+    updateKeywordSelectionUI();
   }
 
   /* ── 키워드 엑셀 다운로드 ── */
   async function downloadKeywordExcel() {
-    if (!currentKeywordData.length) return;
+    const base = selectedKeywordRows();   // 선택 있으면 선택분만, 없으면 전체
+    if (!base.length) return;
     const kw = keywordInput.value.trim();
-    const sorted = [...currentKeywordData].sort((a, b) => (a.brand_kr || '').localeCompare(b.brand_kr || '', 'ko'));
+    const sorted = [...base].sort((a, b) => (a.brand_kr || '').localeCompare(b.brand_kr || '', 'ko'));
     await downloadExportedExcel('keyword', sorted, kw);
   }
 
@@ -848,7 +947,7 @@
   }
 
   function openKeywordPriceCompare() {
-    const skus = [...new Set(currentKeywordData.filter(r => r.sku).map(r => r.sku).filter(Boolean))];
+    const skus = [...new Set(selectedKeywordRows().filter(r => r.sku).map(r => r.sku).filter(Boolean))];
     if (!skus.length) return;
     window.open(priceCompareUrl(skus), 'dfpriceCompare');
   }
