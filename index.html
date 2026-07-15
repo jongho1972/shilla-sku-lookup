@@ -435,7 +435,7 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           일괄복사
         </button>
-        <a id="detailLink" href="#" target="_blank" class="detail-link" style="display:none">상품 페이지 열기 ↗</a>
+        <a id="detailLink" href="#" target="_blank" class="detail-link" style="display:none">상품 페이지 ↗</a>
       </div>
     </div>
   </div>
@@ -890,7 +890,7 @@
     updateSortIndicators(keywordBody.closest('table'), keywordSort);
     keywordBody.innerHTML = sortRows(rows, keywordSort).map((r, i) => {
       const lnk     = r.detail_url
-        ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 열기 ↗</a>` : '';
+        ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 ↗</a>` : '';
       const soldout = r.soldout
         ? ' <span style="color:var(--red-600);font-size:0.75rem">(품절)</span>' : '';
       const key     = keywordRowKey(r);
@@ -1113,7 +1113,7 @@
           <td></td></tr>`;
       }
       const lnk = r.detail_url
-        ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 열기 ↗</a>` : '';
+        ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 ↗</a>` : '';
       return `<tr>
         <td class="bt-num">${i + 1}</td>
         <td>${escHtml(r.brand_kr || '—')}</td>
