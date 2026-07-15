@@ -20,6 +20,13 @@
       --slate-200: #CBD5E1;
       --slate-100: #E5EAF0;
       --slate-050: #EEF2F6;
+      --line: #E5EAF0;
+
+      /* 타입 스케일 — 할인율조회(dfprice)와 동일한 정본 토큰 */
+      --fs-caption: 0.8rem;   /* 라벨·힌트·note·footer·보조버튼 */
+      --fs-body:    0.9rem;   /* 표 헤더 */
+      --fs-data:    0.95rem;  /* 표 본문 */
+      --fs-lead:    1rem;     /* 주 입력창 */
     }
 
     * { box-sizing: border-box; }
@@ -40,12 +47,12 @@
     }
     h1.page-title {
       font-weight: 800; color: var(--navy-900);
-      margin: 0 0 4px; font-size: 1.875rem;
+      margin: 0 0 4px; font-size: clamp(1.6rem, 3.5vw, 1.95rem);
       letter-spacing: -0.025em; line-height: 1.2;
     }
     h1.page-title span { color: var(--blue-500); }
     .page-desc {
-      color: var(--slate-500); font-size: 13px;
+      color: var(--slate-500); font-size: var(--fs-caption);
       margin-top: 6px; letter-spacing: -0.01em; line-height: 1.5;
     }
 
@@ -59,7 +66,7 @@
     .site-btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 16px; border-radius: 6px;
-      font-size: 13px; font-weight: 600;
+      font-size: var(--fs-caption); font-weight: 600;
       background: transparent; color: var(--slate-500);
       border: none; cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em; white-space: nowrap;
@@ -72,9 +79,9 @@
     }
     /* 결과 툴바용 컴팩트 토글 (가격비교 버튼 왼쪽) */
     .site-toggle.inline { margin-top: 0; padding: 2px; margin-right: 4px; }
-    .site-toggle.inline .site-btn { padding: 5px 10px; font-size: 12px; gap: 4px; }
+    .site-toggle.inline .site-btn { padding: 5px 10px; font-size: 0.75rem; gap: 4px; }
     .site-note {
-      font-size: 12px; color: var(--slate-400);
+      font-size: var(--fs-caption); color: var(--slate-400);
       margin-top: 8px; letter-spacing: -0.01em; min-height: 16px;
     }
 
@@ -89,13 +96,13 @@
     h3 {
       border-left: 4px solid var(--navy-900);
       padding: 6px 0 6px 12px;
-      font-weight: 700; font-size: 1.0625rem;
+      font-weight: 700; font-size: 1.05rem;
       color: var(--navy-900);
       letter-spacing: -0.02em; line-height: 1.3;
       margin: 0 0 0.5rem 0;
     }
     .section-desc {
-      font-size: 12px; color: var(--slate-700);
+      font-size: var(--fs-caption); color: var(--slate-700);
       margin-bottom: 14px; padding-left: 16px; letter-spacing: -0.01em;
     }
 
@@ -104,7 +111,7 @@
 
     .sku-input {
       flex: 1; appearance: none;
-      font-family: inherit; font-size: 15px; font-weight: 500;
+      font-family: inherit; font-size: var(--fs-lead); font-weight: 500;
       color: #111827; letter-spacing: 0.02em;
       background-color: #ffffff;
       border: 1px solid var(--slate-200); border-radius: 6px;
@@ -118,7 +125,7 @@
 
     .sku-textarea {
       flex: 1; appearance: none;
-      font-family: inherit; font-size: 14px; font-weight: 500;
+      font-family: inherit; font-size: var(--fs-data); font-weight: 500;
       color: #111827; letter-spacing: 0.02em;
       background-color: #ffffff;
       border: 1px solid var(--slate-200); border-radius: 6px;
@@ -141,7 +148,7 @@
     .search-btn {
       display: inline-flex; align-items: center;
       padding: 0 18px; height: 40px; border-radius: 6px;
-      font-size: 14px; font-weight: 600;
+      font-size: var(--fs-body); font-weight: 600;
       background: var(--navy-900); color: #fff;
       border: none; cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em; white-space: nowrap;
@@ -153,7 +160,7 @@
     .reset-btn {
       display: inline-flex; align-items: center; justify-content: center;
       padding: 0 14px; height: 40px; border-radius: 6px;
-      font-size: 13px; font-weight: 600;
+      font-size: var(--fs-caption); font-weight: 600;
       background: #fff; color: var(--slate-500);
       border: 1px solid var(--slate-200); cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em; white-space: nowrap;
@@ -163,7 +170,7 @@
 
     .status-line {
       margin-top: 10px; min-height: 18px;
-      font-size: 13px; color: var(--slate-500);
+      font-size: var(--fs-caption); color: var(--slate-500);
       letter-spacing: -0.01em;
       display: flex; align-items: center; gap: 6px;
     }
@@ -181,11 +188,11 @@
     }
     .result-card.show { display: block; }
 
-    .result-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .result-table { width: 100%; border-collapse: collapse; font-size: var(--fs-data); }
     .result-table th {
       width: 110px; padding: 9px 10px;
       text-align: left; vertical-align: middle;
-      font-size: 12px; font-weight: 600;
+      font-size: var(--fs-caption); font-weight: 600;
       color: var(--slate-500); letter-spacing: -0.01em; white-space: nowrap;
     }
     .result-table td { padding: 9px 10px; vertical-align: middle; font-weight: 600; color: #111827; }
@@ -193,9 +200,9 @@
     .result-table tr:not(:last-child) th { border-bottom: 1px solid var(--slate-100); }
 
     .cell-wrap { display: flex; align-items: center; gap: 8px; }
-    .td-brand-en { font-size: 15px; font-weight: 700; letter-spacing: 0.04em; }
+    .td-brand-en { font-size: var(--fs-data); font-weight: 700; letter-spacing: 0.04em; }
     .td-ref   { color: var(--navy-900); letter-spacing: 0.05em; }
-    .td-phone { font-size: 15px; font-weight: 700; }
+    .td-phone { font-size: var(--fs-data); font-weight: 700; }
 
     .btn-copy {
       flex-shrink: 0; width: 26px; height: 26px;
@@ -216,7 +223,7 @@
     .bulk-copy-btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 14px; border-radius: 6px;
-      font-size: 13px; font-weight: 600;
+      font-size: var(--fs-caption); font-weight: 600;
       background: #fff; color: var(--slate-700);
       border: 1.5px solid var(--slate-200); cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em;
@@ -227,7 +234,7 @@
     .detail-link {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; border-radius: 6px;
-      font-size: 13px; font-weight: 600; white-space: nowrap;
+      font-size: var(--fs-caption); font-weight: 600; white-space: nowrap;
       background: var(--navy-900); color: #fff;
       text-decoration: none; letter-spacing: -0.01em;
       transition: background 0.15s;
@@ -250,12 +257,12 @@
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 10px;
     }
-    .batch-meta { font-size: 13px; color: var(--slate-500); letter-spacing: -0.01em; }
+    .batch-meta { font-size: var(--fs-caption); color: var(--slate-500); letter-spacing: -0.01em; }
 
     .csv-btn {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 8px 16px; border-radius: 8px;
-      font-size: 12px; font-weight: 700;
+      font-size: var(--fs-caption); font-weight: 700;
       background: #fff; color: var(--navy-900);
       border: 1.5px solid var(--slate-200); cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em;
@@ -268,7 +275,7 @@
     .price-btn {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 8px 16px; border-radius: 8px;
-      font-size: 12px; font-weight: 700;
+      font-size: var(--fs-caption); font-weight: 700;
       background: var(--navy-900); color: #fff;
       border: 1.5px solid var(--navy-900); cursor: pointer;
       font-family: inherit; letter-spacing: -0.01em;
@@ -286,7 +293,7 @@
     }
     .batch-table {
       width: 100%; min-width: 1100px;
-      border-collapse: collapse; font-size: 0.95rem;
+      border-collapse: collapse; font-size: var(--fs-data);
       table-layout: auto;   /* 열 너비를 내용에 맞춰 자동 조정 (REF 등 잘림 방지) */
     }
     .batch-table th:nth-child(1) { width: 48px; }
@@ -300,15 +307,15 @@
     .batch-table td { overflow-wrap: break-word; }
     .batch-table thead th:last-child { background: var(--blue-025); }
     .batch-table thead th {
-      padding: 12px 16px; text-align: left; white-space: nowrap;
-      font-size: 0.875rem; font-weight: 700;
+      padding: 14px 16px; text-align: left; white-space: nowrap;
+      font-size: var(--fs-body); font-weight: 700;
       color: var(--navy-900); letter-spacing: -0.01em;
       background: var(--blue-025); border-bottom: 1px solid var(--slate-100);
     }
     .batch-table tbody tr:not(:last-child) td { border-bottom: 1px solid var(--slate-100); }
     .batch-table td { padding: 14px 16px; vertical-align: middle; color: #111827; font-weight: 500; }
 
-    .bt-num   { color: var(--slate-400); font-size: 0.8rem; font-weight: 700; width: 36px; text-align: center; }
+    .bt-num   { color: var(--slate-400); font-size: var(--fs-caption); font-weight: 700; width: 36px; text-align: center; }
 
     /* ── 키워드 결과: 선택 체크박스 열 ── */
     .keyword-result .batch-table th:nth-child(1),
@@ -317,7 +324,7 @@
       display: inline-flex; align-items: center; gap: 8px;
       cursor: pointer; user-select: none;
     }
-    .check-cell .bt-num-inline { color: var(--slate-400); font-size: 0.8rem; font-weight: 700; }
+    .check-cell .bt-num-inline { color: var(--slate-400); font-size: var(--fs-caption); font-weight: 700; }
     input.row-check, input.select-all {
       width: 15px; height: 15px; margin: 0; cursor: pointer;
       accent-color: var(--navy-900); flex-shrink: 0; vertical-align: middle;
@@ -325,7 +332,7 @@
     .keyword-result .batch-table tbody tr.row-selected td { background: var(--blue-025); }
 
     .sel-count {
-      font-size: 12px; font-weight: 700; color: var(--navy-900);
+      font-size: var(--fs-caption); font-weight: 700; color: var(--navy-900);
       letter-spacing: -0.01em; white-space: nowrap;
       padding: 0 4px;
     }
@@ -350,7 +357,7 @@
 
     .bt-link {
       display: inline-block;
-      font-weight: 600; font-size: 0.8rem;
+      font-weight: 600; font-size: var(--fs-caption);
       color: var(--blue-500); text-decoration: none;
       border: 1px solid var(--slate-200); border-radius: 5px;
       padding: 2px 7px; white-space: nowrap;
@@ -370,7 +377,7 @@
     .site-footer {
       margin-top: 3rem; padding-top: 1.5rem;
       border-top: 1px solid var(--slate-100);
-      font-size: 12px; color: var(--slate-400); letter-spacing: -0.01em;
+      font-size: var(--fs-caption); color: var(--slate-400); letter-spacing: -0.01em;
     }
     .site-footer a { color: var(--slate-400); text-decoration: none; }
     .site-footer a:hover { color: var(--slate-500); }
@@ -389,7 +396,6 @@
     }
     @media (max-width: 560px) {
       .container { padding: 1.75rem 1rem 3rem; }
-      h1.page-title { font-size: 1.5rem; }
       .input-row { flex-direction: column; }
       .btn-group { flex-direction: row; }
       .search-btn, .reset-btn { flex: 1; justify-content: center; }
