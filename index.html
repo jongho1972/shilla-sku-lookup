@@ -580,6 +580,14 @@
   let currentSite = 'kr';   // 'kr' | 'cn' | 'en' | 'jp'
   let lastKeyword = '';     // 토글 전환 시 재검색용
 
+  /* ── 몰별 결과 캐시 ──
+     한 번 조회한 몰은 토글 시 재조회 없이 캐시 결과를 즉시 표시.
+     각 캐시는 { key: 입력식별자, data: 결과 } 형태, 입력이 바뀌면 key 불일치로 자동 무효화. */
+  let siteCache     = { single: {}, batch: {}, keyword: {} };
+  let lastSingleSku = '';   // 마지막 단건 조회 입력(SKU)
+  let lastBatchKey  = '';   // 마지막 다건 조회 입력 정규화 키
+  const batchKeyOf  = raw => raw.split(/[\s,\n\r]+/).map(s => s.trim()).filter(Boolean).join('|');
+
   /* ── 정렬 상태 (열 헤더 클릭) ──
      key=null 이면 원본(입력/검색) 순서. dir: 1=오름차순, -1=내림차순 */
   const NUMERIC_SORT_KEYS = new Set(['sku', 'ref_no']);
@@ -677,21 +685,51 @@
     document.getElementById('batchThBrandKr').textContent   = foreign ? '브랜드명' : '국문 브랜드명';
     document.getElementById('keywordThBrandKr').textContent = foreign ? '브랜드명' : '국문 브랜드명';
 
-    /* 조회 결과가 있는 섹션은 같은 입력으로 해당 몰 자동 재조회, 없으면 그대로 유지 */
-    if (currentSingleData.sku) {
-      if (!singleInput.value.trim()) singleInput.value = currentSingleData.sku;
-      doSingle();
+    /* 조회 결과가 있는 섹션은 해당 몰 캐시가 있으면 즉시 표시, 없으면 같은 입력으로 자동 조회 */
+    // ── 단건 ──
+    if (lastSingleSku) {
+      const inputMatches = !singleInput.value.trim() || singleInput.value.trim() === lastSingleSku;
+      const c = siteCache.single[site];
+      if (inputMatches && c && c.key === lastSingleSku) {
+        singleInput.value = lastSingleSku;
+        renderSingleResult(c.data);
+        showStatus(singleStatus, '');
+      } else {
+        if (!singleInput.value.trim()) singleInput.value = lastSingleSku;
+        doSingle();
+      }
     } else {
       renderSingleResult({});   // 빈 카드 라벨(브랜드명/상품 문의) 갱신
     }
-    if (currentBatchData.length) {
-      if (!batchInput.value.trim())
-        batchInput.value = currentBatchData.map(r => r.sku).filter(Boolean).join('\n');
-      doBatch();
+    // ── 다건 ──
+    if (lastBatchKey) {
+      const inputMatches = !batchInput.value.trim() || batchKeyOf(batchInput.value) === lastBatchKey;
+      const c = siteCache.batch[site];
+      if (inputMatches && c && c.key === lastBatchKey) {
+        currentBatchData = c.data;
+        renderBatchTable(c.data);
+        priceCompareBtn.disabled = c.data.filter(r => !r.error).length === 0;
+        showStatus(batchStatus, '');
+      } else {
+        if (!batchInput.value.trim())
+          batchInput.value = lastBatchKey.split('|').join('\n');
+        doBatch();
+      }
     }
-    if (currentKeywordData.length && lastKeyword) {
-      if (!keywordInput.value.trim()) keywordInput.value = lastKeyword;
-      doKeyword();
+    // ── 키워드 ──
+    if (lastKeyword) {
+      const inputMatches = !keywordInput.value.trim() || keywordInput.value.trim() === lastKeyword;
+      const c = siteCache.keyword[site];
+      if (inputMatches && c && c.key === lastKeyword) {
+        keywordInput.value = lastKeyword;
+        currentKeywordData = c.data;
+        renderKeywordTable(c.data, lastKeyword);
+        keywordPriceCompareBtn.disabled = c.data.filter(r => r.sku).length === 0;
+        showStatus(keywordStatus, '');
+      } else {
+        if (!keywordInput.value.trim()) keywordInput.value = lastKeyword;
+        doKeyword();
+      }
     }
   }
 
@@ -710,6 +748,8 @@
     if (focus) singleInput.focus();
     showStatus(singleStatus, '');
     renderSingleResult({});
+    lastSingleSku = '';
+    siteCache.single = {};
   }
 
   /* ── 키워드 초기화 ── */
@@ -721,6 +761,7 @@
     currentKeywordData = [];
     lastKeyword = '';
     keywordPriceCompareBtn.disabled = true;
+    siteCache.keyword = {};
   }
 
   /* ── 키워드 검색 ── */
@@ -741,6 +782,7 @@
       lastKeyword = kw;
       renderKeywordTable(data, kw);
       keywordPriceCompareBtn.disabled = data.filter(r => r.sku).length === 0;
+      siteCache.keyword[site] = { key: kw, data };
       showStatus(keywordStatus, '');
     } catch {
       showStatus(keywordStatus, '서버에 연결할 수 없습니다', 'error');
@@ -787,6 +829,8 @@
     batchResult.classList.remove('show');
     currentBatchData = [];
     priceCompareBtn.disabled = true;
+    lastBatchKey = '';
+    siteCache.batch = {};
   }
 
   /* ── 면세점별 가격비교 열기 (선택한 몰을 가격비교 사이트 디폴트로 전달) ── */
@@ -823,6 +867,8 @@
       const data = await res.json();
       if (!res.ok) { showStatus(singleStatus, data.detail || '조회 실패', 'error'); return; }
       renderSingleResult(data);
+      lastSingleSku = sku;
+      siteCache.single[site] = { key: sku, data };
       showStatus(singleStatus, '');
     } catch {
       showStatus(singleStatus, '서버에 연결할 수 없습니다', 'error');
@@ -855,6 +901,8 @@
       currentBatchData = data;
       renderBatchTable(data);
       priceCompareBtn.disabled = data.filter(r => !r.error).length === 0;
+      lastBatchKey = skus.join('|');
+      siteCache.batch[site] = { key: lastBatchKey, data };
       showStatus(batchStatus, '');
     } catch {
       showStatus(batchStatus, '서버에 연결할 수 없습니다', 'error');
