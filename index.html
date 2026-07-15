@@ -316,6 +316,16 @@
                 color: var(--slate-700); white-space: nowrap; }
     .bt-error td { color: var(--slate-400) !important; }
 
+    /* ── 정렬 가능한 헤더 ── */
+    .batch-table thead th.sortable { cursor: pointer; user-select: none; }
+    .batch-table thead th.sortable:hover { background: #E4EEF8; }
+    .batch-table thead th.sortable .sort-ind {
+      display: inline-block; margin-left: 5px; font-size: 0.72rem;
+      color: var(--slate-400); vertical-align: middle;
+    }
+    .batch-table thead th.sortable.sorted { color: var(--navy-900); }
+    .batch-table thead th.sortable.sorted .sort-ind { color: var(--blue-600, #2563eb); }
+
     .bt-link {
       display: inline-block;
       font-weight: 600; font-size: 0.8rem;
@@ -456,12 +466,12 @@
         <thead>
           <tr>
             <th class="bt-num">#</th>
-            <th id="batchThBrandKr">국문 브랜드명</th>
-            <th>영문 브랜드명</th>
-            <th>상품유형</th>
-            <th>상품명</th>
-            <th>SKU.NO</th>
-            <th>REF.NO</th>
+            <th id="batchThBrandKr" class="sortable" data-sort="brand_kr">국문 브랜드명<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="brand_en">영문 브랜드명<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="category">상품유형<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="product_name">상품명<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="sku">SKU.NO<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="ref_no">REF.NO<span class="sort-ind">↕</span></th>
             <th></th>
           </tr>
         </thead>
@@ -519,12 +529,12 @@
         <thead>
           <tr>
             <th class="bt-num">#</th>
-            <th id="keywordThBrandKr">국문 브랜드명</th>
-            <th>영문 브랜드명</th>
-            <th>상품유형</th>
-            <th>상품명</th>
-            <th>SKU.NO</th>
-            <th>REF.NO</th>
+            <th id="keywordThBrandKr" class="sortable" data-sort="brand_kr">국문 브랜드명<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="brand_en">영문 브랜드명<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="category">상품유형<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="product_name">상품명<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="sku">SKU.NO<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="ref_no">REF.NO<span class="sort-ind">↕</span></th>
             <th></th>
           </tr>
         </thead>
@@ -569,6 +579,73 @@
   let currentSingleData = {};
   let currentSite = 'kr';   // 'kr' | 'cn' | 'en' | 'jp'
   let lastKeyword = '';     // 토글 전환 시 재검색용
+
+  /* ── 정렬 상태 (열 헤더 클릭) ──
+     key=null 이면 원본(입력/검색) 순서. dir: 1=오름차순, -1=내림차순 */
+  const NUMERIC_SORT_KEYS = new Set(['sku', 'ref_no']);
+  let batchSort   = { key: null,           dir: 1 };
+  let keywordSort = { key: 'product_name', dir: 1 };   // 키워드 결과 기본: 상품명 오름차순
+
+  /* 정렬 비교기 — 에러 행은 항상 맨 아래, 숫자형 키는 수치 비교 */
+  function sortRows(rows, sort) {
+    if (!sort.key) return rows.slice();
+    const numeric = NUMERIC_SORT_KEYS.has(sort.key);
+    return rows.slice().sort((a, b) => {
+      if (a.error && b.error) return 0;
+      if (a.error) return 1;
+      if (b.error) return -1;
+      const av = a[sort.key] ?? '', bv = b[sort.key] ?? '';
+      let cmp;
+      if (numeric) {
+        const an = parseFloat(String(av).replace(/\D/g, '')), bn = parseFloat(String(bv).replace(/\D/g, ''));
+        const aNaN = isNaN(an), bNaN = isNaN(bn);
+        if (aNaN && bNaN) cmp = 0;
+        else if (aNaN) cmp = 1;
+        else if (bNaN) cmp = -1;
+        else cmp = an - bn;
+      } else {
+        cmp = String(av).localeCompare(String(bv), 'ko');
+      }
+      return cmp * sort.dir;
+    });
+  }
+
+  /* 헤더 정렬 표시(↑/↓/↕) 갱신 */
+  function updateSortIndicators(theadTable, sort) {
+    theadTable.querySelectorAll('thead th.sortable').forEach(th => {
+      const ind = th.querySelector('.sort-ind');
+      if (th.dataset.sort === sort.key) {
+        th.classList.add('sorted');
+        th.setAttribute('aria-sort', sort.dir === 1 ? 'ascending' : 'descending');
+        if (ind) ind.textContent = sort.dir === 1 ? '↑' : '↓';
+      } else {
+        th.classList.remove('sorted');
+        th.setAttribute('aria-sort', 'none');
+        if (ind) ind.textContent = '↕';
+      }
+    });
+  }
+
+  /* 헤더 클릭 → 정렬 토글 후 재렌더 연결 */
+  function wireSortHeaders(tbody, getSort, rerender) {
+    const table = tbody.closest('table');
+    table.querySelectorAll('thead th.sortable').forEach(th => {
+      th.setAttribute('role', 'button');       // 키보드 접근성
+      th.setAttribute('tabindex', '0');
+      th.setAttribute('aria-sort', 'none');
+      const toggle = () => {
+        const sort = getSort();
+        const key = th.dataset.sort;
+        if (sort.key === key) sort.dir = -sort.dir;   // 같은 열 재클릭 → 방향 전환
+        else { sort.key = key; sort.dir = 1; }
+        rerender();
+      };
+      th.addEventListener('click', toggle);
+      th.addEventListener('keydown', e => {           // Enter/Space로도 정렬
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+  }
 
   singleInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSingle(); });
   keywordInput.addEventListener('keydown', e => { if (e.key === 'Enter') doKeyword(); });
@@ -617,6 +694,12 @@
       doKeyword();
     }
   }
+
+  /* 정렬 헤더 클릭 연결 (재클릭 시 오름/내림 토글) */
+  wireSortHeaders(keywordBody, () => keywordSort,
+    () => { if (currentKeywordData.length) renderKeywordTable(currentKeywordData, lastKeyword); });
+  wireSortHeaders(batchBody, () => batchSort,
+    () => { if (currentBatchData.length) renderBatchTable(currentBatchData); });
 
   /* 초기 빈 카드 표시 */
   renderSingleResult({});
@@ -668,9 +751,9 @@
 
   /* ── 키워드 결과 렌더 ── */
   function renderKeywordTable(rows, kw) {
-    rows.sort((a, b) => (a.product_name || '').localeCompare(b.product_name || '', 'ko'));
     keywordMeta.textContent = `"${kw}" 검색 결과 ${rows.length}개`;
-    keywordBody.innerHTML = rows.map((r, i) => {
+    updateSortIndicators(keywordBody.closest('table'), keywordSort);
+    keywordBody.innerHTML = sortRows(rows, keywordSort).map((r, i) => {
       const lnk     = r.detail_url
         ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 열기 ↗</a>` : '';
       const soldout = r.soldout
@@ -874,7 +957,8 @@
         ? `총 ${rows.length}개 조회 — 성공 ${ok}개`
         : `SKU ${skuCount}개 · 상품 ${ok}개`)
       + (fail ? ` / 조회 실패 ${fail}개` : '');
-    batchBody.innerHTML = rows.map((r, i) => {
+    updateSortIndicators(batchBody.closest('table'), batchSort);
+    batchBody.innerHTML = sortRows(rows, batchSort).map((r, i) => {
       if (r.error) {
         return `<tr class="bt-error">
           <td class="bt-num">${i + 1}</td>
