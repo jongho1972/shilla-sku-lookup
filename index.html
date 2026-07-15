@@ -287,7 +287,7 @@
     .batch-table {
       width: 100%; min-width: 1100px;
       border-collapse: collapse; font-size: 0.95rem;
-      table-layout: auto;   /* 열 너비를 내용에 맞춰 자동 조정 (REF.NO 등 잘림 방지) */
+      table-layout: auto;   /* 열 너비를 내용에 맞춰 자동 조정 (REF 등 잘림 방지) */
     }
     .batch-table th:nth-child(1) { width: 48px; }
     .batch-table th:nth-child(2) { min-width: 110px; }  /* 국문 브랜드명 */
@@ -296,7 +296,7 @@
     /* 5번째(상품명)는 남는 폭 전부 사용 */
     .batch-table th:nth-child(6),
     .batch-table th:nth-child(7),
-    .batch-table th:nth-child(8) { white-space: nowrap; width: 1%; }  /* SKU.NO·REF.NO·상품 페이지: 내용폭 */
+    .batch-table th:nth-child(8) { white-space: nowrap; width: 1%; }  /* SKU·REF·상품 페이지: 내용폭 */
     .batch-table td { overflow-wrap: break-word; }
     .batch-table thead th:last-child { background: var(--blue-025); }
     .batch-table thead th {
@@ -404,7 +404,7 @@
 
   <p class="eyebrow">SHILLA · SKU LOOKUP</p>
   <h1 class="page-title">신라면세점 <span>SKU 조회</span></h1>
-  <p class="page-desc" id="pageDesc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호</p>
+  <p class="page-desc" id="pageDesc">SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF · 상품 문의 전화번호</p>
   <p class="site-note" id="siteNote"></p>
 
   <!-- ────────────── 단건 조회 ────────────── -->
@@ -716,8 +716,8 @@
     });
     const info = SITE_INFO[site];
     document.getElementById('pageDesc').textContent = foreign
-      ? `SKU 번호 입력 → 브랜드명 · ${info.lang} 상품명 · REF.NO`
-      : 'SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF.NO · 상품 문의 전화번호';
+      ? `SKU 번호 입력 → 브랜드명 · ${info.lang} 상품명 · REF`
+      : 'SKU 번호 입력 → 국문/영문 브랜드명 · 상품명 · REF · 상품 문의 전화번호';
     document.getElementById('siteNote').textContent = foreign
       ? `${info.mall} 결과 표시 — 입력은 국문몰과 동일하게 하시면 됩니다. 상품명은 ${info.lang}으로 표시되며, 상품 문의 전화번호는 지원되지 않습니다`
       : '';
