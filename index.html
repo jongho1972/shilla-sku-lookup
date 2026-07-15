@@ -399,9 +399,41 @@
       .input-row { flex-direction: column; }
       .btn-group { flex-direction: row; }
       .search-btn, .reset-btn { flex: 1; justify-content: center; }
-      .batch-table { min-width: 880px; font-size: 0.82rem; }
-      .batch-table thead th, .batch-table td { padding: 9px 10px; }
       .batch-toolbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+
+    /* ── 모바일(≤720px): 결과표를 카드형으로 — 할인율조회(dfprice)와 동일 ── */
+    @media (max-width: 720px) {
+      .batch-result.show, .keyword-result.show {
+        left: auto; transform: none; width: 100%;   /* 카드형은 전폭 오프셋 불필요 */
+      }
+      .batch-scroll {
+        overflow-x: visible; border: none; border-radius: 0; background: transparent;
+      }
+      .batch-table { min-width: 0; width: 100%; font-size: var(--fs-data); }
+      .batch-table thead { display: none; }
+      .batch-table, .batch-table tbody, .batch-table tr, .batch-table td { display: block; width: 100%; }
+      .batch-table tr {
+        border: 1px solid var(--slate-100); border-radius: 12px;
+        background: #fff; padding: 14px 16px; margin-bottom: 12px;
+      }
+      .keyword-result .batch-table tbody tr.row-selected { background: var(--blue-025); }
+      .batch-table tbody tr:not(:last-child) td { border-bottom: none; }
+      .batch-table td {
+        padding: 6px 0; border: none;
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 14px; text-align: right; white-space: normal; word-break: break-word;
+      }
+      .batch-table td:empty { display: none; }   /* 값 없는 링크 셀 등은 숨김 */
+      .batch-table td::before {
+        content: attr(data-label);
+        font-weight: 700; color: var(--navy-900);
+        font-size: var(--fs-caption); text-align: left;
+        flex-shrink: 0; white-space: nowrap;
+      }
+      .batch-table td.bt-num { justify-content: flex-start; gap: 10px; width: 100%; }
+      .batch-table td .detail-link { margin-left: auto; }
+      .bt-error td[colspan] { text-align: left; }
     }
   </style>
 </head>
@@ -902,16 +934,16 @@
       const key     = keywordRowKey(r);
       const checked = keywordSelected.has(key);
       return `<tr${checked ? ' class="row-selected"' : ''}>
-        <td class="bt-num"><label class="check-cell">
+        <td class="bt-num" data-label="#"><label class="check-cell">
           <input type="checkbox" class="row-check" data-key="${escAttr(key)}"${checked ? ' checked' : ''} aria-label="행 선택" />
           <span class="bt-num-inline">${i + 1}</span></label></td>
-        <td>${escHtml(r.brand_kr || '—')}</td>
-        <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
-        <td class="bt-cat">${escHtml(r.category || '—')}</td>
-        <td class="bt-name">${escHtml(r.product_name || '—')}${soldout}</td>
-        <td class="bt-sku">${escHtml(r.sku || '—')}</td>
-        <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
-        <td>${lnk}</td></tr>`;
+        <td data-label="국문 브랜드명">${escHtml(r.brand_kr || '—')}</td>
+        <td class="bt-brand-en" data-label="영문 브랜드명">${escHtml(r.brand_en || '—')}</td>
+        <td class="bt-cat" data-label="상품유형">${escHtml(r.category || '—')}</td>
+        <td class="bt-name" data-label="상품명">${escHtml(r.product_name || '—')}${soldout}</td>
+        <td class="bt-sku" data-label="SKU">${escHtml(r.sku || '—')}</td>
+        <td class="bt-ref" data-label="REF">${escHtml(r.ref_no || '—')}</td>
+        <td data-label="링크">${lnk}</td></tr>`;
     }).join('');
     keywordResult.classList.add('show');
     updateKeywordSelectionUI();
@@ -1114,21 +1146,21 @@
     batchBody.innerHTML = sortRows(rows, batchSort).map((r, i) => {
       if (r.error) {
         return `<tr class="bt-error">
-          <td class="bt-num">${i + 1}</td>
-          <td colspan="6" style="color:var(--slate-400);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
+          <td class="bt-num" data-label="#">${i + 1}</td>
+          <td colspan="6" data-label="상태" style="color:var(--slate-400);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
           <td></td></tr>`;
       }
       const lnk = r.detail_url
         ? `<a class="detail-link" href="${escAttr(r.detail_url)}" target="_blank">상품 페이지 ↗</a>` : '';
       return `<tr>
-        <td class="bt-num">${i + 1}</td>
-        <td>${escHtml(r.brand_kr || '—')}</td>
-        <td class="bt-brand-en">${escHtml(r.brand_en || '—')}</td>
-        <td class="bt-cat">${escHtml(r.category || '—')}</td>
-        <td class="bt-name">${escHtml(r.product_name || '—')}</td>
-        <td class="bt-sku">${escHtml(r.sku || '—')}</td>
-        <td class="bt-ref">${escHtml(r.ref_no || '—')}</td>
-        <td>${lnk}</td></tr>`;
+        <td class="bt-num" data-label="#">${i + 1}</td>
+        <td data-label="국문 브랜드명">${escHtml(r.brand_kr || '—')}</td>
+        <td class="bt-brand-en" data-label="영문 브랜드명">${escHtml(r.brand_en || '—')}</td>
+        <td class="bt-cat" data-label="상품유형">${escHtml(r.category || '—')}</td>
+        <td class="bt-name" data-label="상품명">${escHtml(r.product_name || '—')}</td>
+        <td class="bt-sku" data-label="SKU">${escHtml(r.sku || '—')}</td>
+        <td class="bt-ref" data-label="REF">${escHtml(r.ref_no || '—')}</td>
+        <td data-label="링크">${lnk}</td></tr>`;
     }).join('');
     batchResult.classList.add('show');
   }
