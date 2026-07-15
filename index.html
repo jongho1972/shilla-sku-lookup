@@ -346,7 +346,7 @@
       color: var(--slate-400); vertical-align: middle;
     }
     .batch-table thead th.sortable.sorted { color: var(--navy-900); }
-    .batch-table thead th.sortable.sorted .sort-ind { color: var(--blue-600, #2563eb); }
+    .batch-table thead th.sortable.sorted .sort-ind { color: var(--navy-900); }
 
     .bt-link {
       display: inline-block;
@@ -492,8 +492,8 @@
             <th class="sortable" data-sort="brand_en">영문 브랜드명<span class="sort-ind">↕</span></th>
             <th class="sortable" data-sort="category">상품유형<span class="sort-ind">↕</span></th>
             <th class="sortable" data-sort="product_name">상품명<span class="sort-ind">↕</span></th>
-            <th class="sortable" data-sort="sku">SKU.NO<span class="sort-ind">↕</span></th>
-            <th class="sortable" data-sort="ref_no">REF.NO<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="sku">SKU<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="ref_no">REF<span class="sort-ind">↕</span></th>
             <th></th>
           </tr>
         </thead>
@@ -560,8 +560,8 @@
             <th class="sortable" data-sort="brand_en">영문 브랜드명<span class="sort-ind">↕</span></th>
             <th class="sortable" data-sort="category">상품유형<span class="sort-ind">↕</span></th>
             <th class="sortable" data-sort="product_name">상품명<span class="sort-ind">↕</span></th>
-            <th class="sortable" data-sort="sku">SKU.NO<span class="sort-ind">↕</span></th>
-            <th class="sortable" data-sort="ref_no">REF.NO<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="sku">SKU<span class="sort-ind">↕</span></th>
+            <th class="sortable" data-sort="ref_no">REF<span class="sort-ind">↕</span></th>
             <th></th>
           </tr>
         </thead>
@@ -1050,8 +1050,8 @@
       ['영문 브랜드명', d.brand_en    || '—', 'td-brand-en'],
       ['상품유형',      d.category    || '—', ''],
       ['상품명',        d.product_name|| '—', ''],
-      ['SKU.NO',        d.sku         || '—', ''],
-      ['REF.NO',        d.ref_no      || '—', 'td-ref'],
+      ['SKU',           d.sku         || '—', ''],
+      ['REF',           d.ref_no      || '—', 'td-ref'],
     ];
     if (!foreign) rows.push(['상품 문의', d.phone || '—', 'td-phone']);
     tbl.innerHTML = rows.map(([label, value, cls]) => {
