@@ -657,14 +657,14 @@
     });
   }
 
-  /* 헤더 정렬 표시(↑/↓/↕) 갱신 */
+  /* 헤더 정렬 표시(▲/▼/↕) 갱신 — 할인율조회(dfprice)와 동일한 삼각형 표기 */
   function updateSortIndicators(theadTable, sort) {
     theadTable.querySelectorAll('thead th.sortable').forEach(th => {
       const ind = th.querySelector('.sort-ind');
       if (th.dataset.sort === sort.key) {
         th.classList.add('sorted');
         th.setAttribute('aria-sort', sort.dir === 1 ? 'ascending' : 'descending');
-        if (ind) ind.textContent = sort.dir === 1 ? '↑' : '↓';
+        if (ind) ind.textContent = sort.dir === 1 ? '▲' : '▼';
       } else {
         th.classList.remove('sorted');
         th.setAttribute('aria-sort', 'none');
