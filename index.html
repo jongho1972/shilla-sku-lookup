@@ -220,6 +220,7 @@
       border-top: 1px solid var(--slate-100);
       display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
+    .footer-btns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .bulk-copy-btn {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 14px; border-radius: 6px;
@@ -469,10 +470,16 @@
     <div class="result-card show" id="resultCard">
       <table class="result-table" id="resultTable"></table>
       <div class="result-footer">
-        <button class="bulk-copy-btn" id="bulkCopyBtn" onclick="copyBulkFormat()" style="display:none">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          일괄복사
-        </button>
+        <div class="footer-btns">
+          <button class="bulk-copy-btn" id="bulkCopyBtn" onclick="copyBulkFormat()" style="display:none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            일괄복사
+          </button>
+          <button class="bulk-copy-btn" id="mailFormatBtn" onclick="copyMailFormat()" style="display:none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+            메일포맷
+          </button>
+        </div>
         <a id="detailLink" href="#" target="_blank" class="detail-link" style="display:none">상품 페이지 ↗</a>
       </div>
     </div>
@@ -615,6 +622,11 @@
 
 <script>
   /* ── DOM refs ── */
+  /* ── 아이콘 (렌더 함수보다 먼저 선언 — 하단에서 초기 렌더를 호출함) ── */
+  const COPY_ICON  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  const CHECK_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const MAIL_ICON  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>`;
+
   const singleInput  = document.getElementById('singleInput');
   const singleBtn    = document.getElementById('singleBtn');
   const singleStatus = document.getElementById('singleStatus');
@@ -651,6 +663,7 @@
   const batchMeta        = document.getElementById('batchMeta');
   const priceCompareBtn  = document.getElementById('priceCompareBtn');
   const bulkCopyBtn      = document.getElementById('bulkCopyBtn');
+  const mailFormatBtn    = document.getElementById('mailFormatBtn');
 
   let currentBatchData  = [];
   let currentSingleData = {};
@@ -1078,9 +1091,6 @@
   }
 
   /* ── 단건 렌더 ── */
-  const COPY_ICON  = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-  const CHECK_ICON = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-
   function renderSingleResult(d) {
     const foreign = currentSite !== 'kr';
     const rows = [
@@ -1102,16 +1112,27 @@
     link.style.display = d.detail_url ? 'inline-flex' : 'none';
     currentSingleData = d;
     bulkCopyBtn.style.display = d.sku ? 'inline-flex' : 'none';
-    bulkCopyBtn.textContent = '';
-    bulkCopyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 일괄복사`;
+    bulkCopyBtn.innerHTML = `${COPY_ICON} 일괄복사`;
     bulkCopyBtn.classList.remove('copied');
+    mailFormatBtn.style.display = d.sku ? 'inline-flex' : 'none';
+    mailFormatBtn.innerHTML = `${MAIL_ICON} 메일포맷`;
+    mailFormatBtn.classList.remove('copied');
     card.classList.add('show');
   }
 
-  /* ── 일괄복사 ── */
-  function copyBulkFormat() {
-    const d = currentSingleData;
-    const text = [
+  /* ── 일괄복사 / 메일포맷 ── */
+  function flashCopied(btn, icon, label) {
+    btn.innerHTML = `${CHECK_ICON} 복사됨!`;
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = `${icon} ${label}`;
+      btn.classList.remove('copied');
+    }, 1500);
+  }
+
+  /* VOC 항목 블록 — 일괄복사·메일포맷 공통 */
+  function vocBlock(d) {
+    return [
       '# 고객 : ',
       `# SKU : ${d.sku || ''}`,
       `# REF : ${d.ref_no || ''}`,
@@ -1122,13 +1143,30 @@
       '# VOC 내용',
       '- ',
     ].join('\n');
+  }
+
+  function copyBulkFormat() {
+    navigator.clipboard.writeText(vocBlock(currentSingleData)).then(() => {
+      flashCopied(bulkCopyBtn, COPY_ICON, '일괄복사');
+    });
+  }
+
+  function copyMailFormat() {
+    const d = currentSingleData;
+    const brand = d.brand_kr || '';
+    const text = [
+      `[신라면세점] ${brand} 상품 건_`,
+      '',
+      '안녕하세요,',
+      '신라면세점 온라인CS 입니다.',
+      '',
+      `${brand} 상품 관련 VOC가 접수되어 메일드립니다.`,
+      '아래 내용 확인 부탁드립니다.',
+      '',
+      vocBlock(d),
+    ].join('\n');
     navigator.clipboard.writeText(text).then(() => {
-      bulkCopyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 복사됨!`;
-      bulkCopyBtn.classList.add('copied');
-      setTimeout(() => {
-        bulkCopyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 일괄복사`;
-        bulkCopyBtn.classList.remove('copied');
-      }, 1500);
+      flashCopied(mailFormatBtn, MAIL_ICON, '메일포맷');
     });
   }
 
