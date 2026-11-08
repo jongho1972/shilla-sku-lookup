@@ -34,8 +34,7 @@
     html, body {
       margin: 0; padding: 0;
       background: #ffffff; color: #111827;
-      font-family: -apple-system, BlinkMacSystemFont, "Pretendard",
-                   "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       letter-spacing: -0.011em;
     }
 
@@ -337,12 +336,12 @@
       letter-spacing: -0.01em; white-space: nowrap;
       padding: 0 4px;
     }
-    .bt-sku   { font-family: ui-monospace,"SF Mono","Fira Code",monospace; font-size: 0.88rem;
+    .bt-sku   { font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; font-variant-numeric: tabular-nums; font-size: 0.88rem;
                 font-weight: 700; color: var(--navy-900); letter-spacing: 0.03em; white-space: nowrap; }
     .bt-brand-en { font-weight: 700; letter-spacing: 0.04em; }
     .bt-cat   { white-space: nowrap; }
     .bt-name  { font-weight: 600; color: var(--navy-900); }
-    .bt-ref   { font-family: ui-monospace,"SF Mono","Fira Code",monospace; font-size: 0.85rem;
+    .bt-ref   { font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; font-variant-numeric: tabular-nums; font-size: 0.85rem;
                 color: var(--slate-700); white-space: nowrap; }
     .bt-error td { color: var(--slate-400) !important; }
 
@@ -436,7 +435,9 @@
       .batch-table td .detail-link { margin-left: auto; }
       .bt-error td[colspan] { text-align: left; }
     }
+    button,input,select,textarea{font-family:inherit}
   </style>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
