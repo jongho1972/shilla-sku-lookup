@@ -1,5 +1,7 @@
-fastapi>=0.111.0
-uvicorn[standard]>=0.29.0
-curl_cffi>=0.7.2
-beautifulsoup4>=4.12.0
-openpyxl>=3.1.0
+# 버전 고정(2026-11-11): 운영 컨테이너 설치 버전 기준. 무제한 핀은 재빌드 때 조용히 올라가는 사고 원인(관광통계 pandas 3.x 사례).
+# 올릴 때는 깨끗한 venv에서 동작 확인 후 함께 갱신할 것.
+fastapi==0.162.2
+uvicorn[standard]==0.54.0
+curl_cffi==0.17.0
+beautifulsoup4==4.15.0
+openpyxl==3.1.5
