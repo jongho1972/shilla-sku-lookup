@@ -9,18 +9,18 @@
     :root {
       --navy-900: #0B2E5C;
       --navy-700: #13407F;
-      --blue-500: #1F6FEB;
+      --blue-500: #1D5FD1;
       --blue-050: #DCE8F6;
       --blue-025: #F4F7FB;
       --red-600:  #B42318;
       --green-700:#047857;
       --slate-700: #334155;
-      --slate-500: #64748B;
+      --slate-500: #5A6B82;
       --slate-400: #94A3B8;
       --slate-200: #CBD5E1;
-      --slate-100: #E5EAF0;
+      --slate-100: #E4E9F0;
       --slate-050: #EEF2F6;
-      --line: #E5EAF0;
+      --line: #E4E9F0;
 
       /* 타입 스케일 — 할인율조회(dfprice)와 동일한 정본 토큰 */
       --fs-caption: 0.8rem;   /* 라벨·힌트·note·footer·보조버튼 */
@@ -33,7 +33,7 @@
 
     html, body {
       margin: 0; padding: 0;
-      background: #ffffff; color: #111827;
+      background: #F7F8FA; color: #0D1B2E;
       font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       letter-spacing: -0.011em;
     }
@@ -42,7 +42,7 @@
 
     .eyebrow {
       letter-spacing: 0.2em; font-weight: 700; font-size: 0.7rem;
-      color: var(--slate-400); margin: 0 0 10px; text-transform: uppercase;
+      color: var(--slate-500); margin: 0 0 10px; text-transform: uppercase;
     }
     h1.page-title {
       font-weight: 800; color: var(--navy-900);
@@ -80,13 +80,13 @@
     .site-toggle.inline { margin-top: 0; padding: 2px; margin-right: 4px; }
     .site-toggle.inline .site-btn { padding: 5px 10px; font-size: 0.75rem; gap: 4px; }
     .site-note {
-      font-size: var(--fs-caption); color: var(--slate-400);
+      font-size: var(--fs-caption); color: var(--slate-500);
       margin-top: 8px; letter-spacing: -0.01em; min-height: 16px;
     }
 
     /* ── 섹션 박스 ── */
     .section-box {
-      background: var(--slate-050);
+      background: #fff;
       border: 1px solid var(--slate-100);
       border-radius: 12px;
       padding: 1.5rem;
@@ -111,7 +111,7 @@
     .sku-input {
       flex: 1; appearance: none;
       font-family: inherit; font-size: var(--fs-lead); font-weight: 500;
-      color: #111827; letter-spacing: 0.02em;
+      color: #0D1B2E; letter-spacing: 0.02em;
       background-color: #ffffff;
       border: 1px solid var(--slate-200); border-radius: 6px;
       padding: 8px 14px; height: 40px;
@@ -125,7 +125,7 @@
     .sku-textarea {
       flex: 1; appearance: none;
       font-family: inherit; font-size: var(--fs-data); font-weight: 500;
-      color: #111827; letter-spacing: 0.02em;
+      color: #0D1B2E; letter-spacing: 0.02em;
       background-color: #ffffff;
       border: 1px solid var(--slate-200); border-radius: 6px;
       padding: 10px 14px; outline: none; resize: vertical;
@@ -194,7 +194,7 @@
       font-size: var(--fs-caption); font-weight: 600;
       color: var(--slate-500); letter-spacing: -0.01em; white-space: nowrap;
     }
-    .result-table td { padding: 9px 10px; vertical-align: middle; font-weight: 600; color: #111827; }
+    .result-table td { padding: 9px 10px; vertical-align: middle; font-weight: 600; color: #0D1B2E; }
     .result-table tr:not(:last-child) td,
     .result-table tr:not(:last-child) th { border-bottom: 1px solid var(--slate-100); }
 
@@ -313,9 +313,9 @@
       background: var(--blue-025); border-bottom: 1px solid var(--slate-100);
     }
     .batch-table tbody tr:not(:last-child) td { border-bottom: 1px solid var(--slate-100); }
-    .batch-table td { padding: 14px 16px; vertical-align: middle; color: #111827; font-weight: 500; }
+    .batch-table td { padding: 14px 16px; vertical-align: middle; color: #0D1B2E; font-weight: 500; }
 
-    .bt-num   { color: var(--slate-400); font-size: var(--fs-caption); font-weight: 700; width: 36px; text-align: center; }
+    .bt-num   { color: var(--slate-500); font-size: var(--fs-caption); font-weight: 700; width: 36px; text-align: center; }
 
     /* ── 키워드 결과: 선택 체크박스 열 ── */
     .keyword-result .batch-table th:nth-child(1),
@@ -324,7 +324,7 @@
       display: inline-flex; align-items: center; gap: 8px;
       cursor: pointer; user-select: none;
     }
-    .check-cell .bt-num-inline { color: var(--slate-400); font-size: var(--fs-caption); font-weight: 700; }
+    .check-cell .bt-num-inline { color: var(--slate-500); font-size: var(--fs-caption); font-weight: 700; }
     input.row-check, input.select-all {
       width: 15px; height: 15px; margin: 0; cursor: pointer;
       accent-color: var(--navy-900); flex-shrink: 0; vertical-align: middle;
@@ -343,7 +343,7 @@
     .bt-name  { font-weight: 600; color: var(--navy-900); }
     .bt-ref   { font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; font-variant-numeric: tabular-nums; font-size: 0.85rem;
                 color: var(--slate-700); white-space: nowrap; }
-    .bt-error td { color: var(--slate-400) !important; }
+    .bt-error td { color: var(--slate-500) !important; }
 
     /* ── 정렬 가능한 헤더 ── */
     .batch-table thead th.sortable { cursor: pointer; user-select: none; }
@@ -377,9 +377,9 @@
     .site-footer {
       margin-top: 3rem; padding-top: 1.5rem;
       border-top: 1px solid var(--slate-100);
-      font-size: var(--fs-caption); color: var(--slate-400); letter-spacing: -0.01em;
+      font-size: var(--fs-caption); color: var(--slate-500); letter-spacing: -0.01em;
     }
-    .site-footer a { color: var(--slate-400); text-decoration: none; }
+    .site-footer a { color: var(--slate-500); text-decoration: none; }
     .site-footer a:hover { color: var(--slate-500); }
 
     .batch-scroll::-webkit-scrollbar { height: 6px; }
@@ -1186,7 +1186,7 @@
       if (r.error) {
         return `<tr class="bt-error">
           <td class="bt-num" data-label="#">${i + 1}</td>
-          <td colspan="6" data-label="상태" style="color:var(--slate-400);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
+          <td colspan="6" data-label="상태" style="color:var(--slate-500);font-style:italic">SKU ${escHtml(r.sku)} — 조회 실패</td>
           <td></td></tr>`;
       }
       const lnk = r.detail_url
